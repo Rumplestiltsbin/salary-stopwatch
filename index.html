@@ -3,75 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Salary Stopwatch</title>
+  <title>Salary Stopwatch App</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
-      background: #f4f4f4;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
     }
+
     h1 {
-      margin-bottom: 10px;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 0.25rem;
     }
-    #earnings {
-      font-size: 2.5em;
-      margin: 20px 0;
-      color: green;
+
+    p.description {
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      max-width: 400px;
     }
+
     input {
-      padding: 10px;
-      font-size: 1em;
-      margin: 10px;
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      width: 100%;
+      max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
     }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
     button {
-      padding: 10px 20px;
-      font-size: 1em;
-      margin: 10px;
+      font-size: 1rem;
+      padding: 0.5rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #display {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: green;
+      margin-top: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      p.description {
+        font-size: 1.1rem;
+      }
+
+      input, button {
+        font-size: 1.1rem;
+      }
+
+      #display {
+        font-size: 3rem;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Salary Stopwatch App</h1>
-  <p>Enter your annual salary and working hours to track your earnings in real-time.</p>
-
-  <div>
-    <input type="number" id="salary" placeholder="Annual Salary (£)" />
-    <input type="number" id="hours" placeholder="Hours per week" />
+  <p class="description">
+    Enter your annual salary and working hours to track your earnings in real-time.
+  </p>
+  <input id="salary" type="number" placeholder="Annual Salary (£)" />
+  <input id="hours" type="number" placeholder="Hours per week" />
+  <div class="button-group">
     <button onclick="start()">Start</button>
+    <button onclick="pause()">Pause</button>
     <button onclick="reset()">Reset</button>
   </div>
-
-  <div id="earnings">£0.00</div>
+  <div id="display">£0.00</div>
 
   <script>
-    let interval;
-    let totalEarned = 0;
+    let interval, earnings = 0;
 
-    function start() {
+    function getPerSecondSalary() {
       const salary = parseFloat(document.getElementById('salary').value);
       const hours = parseFloat(document.getElementById('hours').value);
+      if (!salary || !hours) return 0;
+      return salary / (hours * 3600 * 52);
+    }
 
-      if (!salary || !hours) {
-        alert('Please enter both salary and hours per week.');
-        return;
-      }
+    function updateDisplay() {
+      document.getElementById('display').innerText = "£" + earnings.toFixed(2);
+    }
 
-      if (interval) clearInterval(interval);
-      totalEarned = 0;
-
-      const earningsPerSecond = salary / (52 * hours * 3600);
-
+    function start() {
+      if (interval) return;
+      const rate = getPerSecondSalary();
+      if (rate === 0) return alert('Please enter valid salary and hours.');
       interval = setInterval(() => {
-        totalEarned += earningsPerSecond;
-        document.getElementById('earnings').textContent = '£' + totalEarned.toFixed(2);
+        earnings += rate;
+        updateDisplay();
       }, 1000);
     }
 
-    function reset() {
+    function pause() {
       clearInterval(interval);
-      totalEarned = 0;
-      document.getElementById('earnings').textContent = '£0.00';
+      interval = null;
+    }
+
+    function reset() {
+      pause();
+      earnings = 0;
+      updateDisplay();
     }
   </script>
 </body>
