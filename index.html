@@ -69,6 +69,10 @@
       margin-top: 1rem;
     }
 
+    .hidden {
+      display: none;
+    }
+
     @media (min-width: 768px) {
       h1 {
         font-size: 2.5rem;
@@ -89,21 +93,32 @@
   </style>
 </head>
 <body>
-  <h1>Salary Stopwatch App</h1>
-  <p class="description">
-    Enter your annual salary and working hours to track your earnings in real-time.
-  </p>
-  <input id="salary" type="number" placeholder="Annual Salary (£)" />
-  <input id="hours" type="number" placeholder="Hours per week" />
-  <div class="button-group">
-    <button onclick="start()">Start</button>
-    <button onclick="pause()">Pause</button>
-    <button onclick="reset()">Reset</button>
+
+  <!-- Configuration View -->
+  <div id="configView">
+    <h1>Salary Stopwatch App</h1>
+    <p class="description">
+      Enter your annual salary and working hours to track your earnings in real-time.
+    </p>
+    <input id="salary" type="number" placeholder="Annual Salary (£)" />
+    <input id="hours" type="number" placeholder="Hours per week" />
+    <div class="button-group">
+      <button onclick="start()">Start</button>
+    </div>
   </div>
-  <div id="display">£0.00</div>
+
+  <!-- Stopwatch View -->
+  <div id="stopwatchView" class="hidden">
+    <div id="display">£0.00</div>
+    <div class="button-group">
+      <button onclick="reset()">Reset</button>
+    </div>
+  </div>
 
   <script>
-    let interval, earnings = 0;
+    let interval;
+    let earnings = 0;
+    let perSecond = 0;
 
     function getPerSecondSalary() {
       const salary = parseFloat(document.getElementById('salary').value);
@@ -117,25 +132,29 @@
     }
 
     function start() {
-      if (interval) return;
-      const rate = getPerSecondSalary();
-      if (rate === 0) return alert('Please enter valid salary and hours.');
+      perSecond = getPerSecondSalary();
+      if (perSecond === 0) return alert('Please enter valid salary and hours.');
+
+      document.getElementById('configView').classList.add('hidden');
+      document.getElementById('stopwatchView').classList.remove('hidden');
+
       interval = setInterval(() => {
-        earnings += rate;
+        earnings += perSecond;
         updateDisplay();
       }, 1000);
     }
 
-    function pause() {
+    function reset() {
       clearInterval(interval);
       interval = null;
-    }
-
-    function reset() {
-      pause();
       earnings = 0;
       updateDisplay();
+      document.getElementById('salary').value = '';
+      document.getElementById('hours').value = '';
+      document.getElementById('stopwatchView').classList.add('hidden');
+      document.getElementById('configView').classList.remove('hidden');
     }
   </script>
 </body>
 </html>
+
