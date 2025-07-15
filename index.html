@@ -1,89 +1,77 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Salary Stopwatch</title>
   <style>
     body {
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #111;
-      color: #fff;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f4f4f4;
     }
     h1 {
-      margin-bottom: 0.5em;
+      margin-bottom: 10px;
     }
-    .clock {
-      font-size: 3em;
-      font-weight: bold;
-      margin: 1em 0;
+    #earnings {
+      font-size: 2.5em;
+      margin: 20px 0;
+      color: green;
     }
     input {
-      padding: 0.5em;
+      padding: 10px;
       font-size: 1em;
-      text-align: center;
-      margin-bottom: 1em;
+      margin: 10px;
     }
     button {
-      padding: 0.5em 1em;
+      padding: 10px 20px;
       font-size: 1em;
-      cursor: pointer;
-      margin: 0.25em;
+      margin: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Salary Stopwatch</h1>
-  <label for="salary">Enter Annual Salary (£):</label>
-  <input type="number" id="salary" placeholder="e.g. 35000" />
-  <div class="clock" id="earnings">£0.00</div>
+  <h1>Salary Stopwatch App</h1>
+  <p>Enter your annual salary and working hours to track your earnings in real-time.</p>
+
   <div>
+    <input type="number" id="salary" placeholder="Annual Salary (£)" />
+    <input type="number" id="hours" placeholder="Hours per week" />
     <button onclick="start()">Start</button>
-    <button onclick="pause()">Pause</button>
     <button onclick="reset()">Reset</button>
   </div>
 
-  <script>
-    let interval = null;
-    let earnings = 0;
-    let salary = 0;
-    let isRunning = false;
+  <div id="earnings">£0.00</div>
 
-    function updateDisplay() {
-      document.getElementById('earnings').innerText = '£' + earnings.toFixed(2);
-    }
+  <script>
+    let interval;
+    let totalEarned = 0;
 
     function start() {
-      if (isRunning) return;
-      salary = parseFloat(document.getElementById('salary').value);
-      if (!salary || salary <= 0) {
-        alert("Please enter a valid salary");
+      const salary = parseFloat(document.getElementById('salary').value);
+      const hours = parseFloat(document.getElementById('hours').value);
+
+      if (!salary || !hours) {
+        alert('Please enter both salary and hours per week.');
         return;
       }
-      isRunning = true;
-      const ratePerSecond = (salary / 52 / 37.5 / 60 / 60);
+
+      if (interval) clearInterval(interval);
+      totalEarned = 0;
+
+      const earningsPerSecond = salary / (52 * hours * 3600);
+
       interval = setInterval(() => {
-        earnings += ratePerSecond;
-        updateDisplay();
+        totalEarned += earningsPerSecond;
+        document.getElementById('earnings').textContent = '£' + totalEarned.toFixed(2);
       }, 1000);
     }
 
-    function pause() {
-      clearInterval(interval);
-      isRunning = false;
-    }
-
     function reset() {
-      pause();
-      earnings = 0;
-      updateDisplay();
+      clearInterval(interval);
+      totalEarned = 0;
+      document.getElementById('earnings').textContent = '£0.00';
     }
   </script>
 </body>
