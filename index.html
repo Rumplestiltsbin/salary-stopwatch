@@ -6,155 +6,140 @@
   <title>Salary Stopwatch App</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f9f9f9;
-      color: #000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
-    }
-
-    h1 {
-      font-size: 2rem;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
       text-align: center;
-      margin-bottom: 0.25rem;
-    }
-
-    p.description {
-      font-size: 1rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      max-width: 400px;
-    }
-
-    input {
-      font-size: 1rem;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      width: 100%;
-      max-width: 300px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 1.5rem 0;
-    }
-
-    button {
-      font-size: 1rem;
-      padding: 0.5rem 1.2rem;
-      border: none;
-      border-radius: 6px;
-      background-color: #007bff;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #display {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: green;
-      margin-top: 1rem;
+      padding: 40px;
     }
 
     .hidden {
       display: none;
     }
 
-    @media (min-width: 768px) {
-      h1 {
-        font-size: 2.5rem;
-      }
+    h1 {
+      font-size: 2.5em;
+    }
 
-      p.description {
-        font-size: 1.1rem;
-      }
+    #config, #stopwatch {
+      margin-top: 30px;
+    }
 
-      input, button {
-        font-size: 1.1rem;
-      }
+    input, select, button {
+      padding: 12px;
+      margin: 10px;
+      font-size: 1em;
+      width: 250px;
+    }
 
-      #display {
-        font-size: 3rem;
-      }
+    #start, #reset {
+      width: auto;
+      padding: 12px 24px;
+      cursor: pointer;
+    }
+
+    /* View Modes */
+    .simple-display {
+      font-size: 3em;
+      font-weight: bold;
+      color: green;
+    }
+
+    .digital-display {
+      font-family: 'Courier New', monospace;
+      font-size: 3em;
+      color: red;
+      background: black;
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+      letter-spacing: 4px;
+      box-shadow: 0 0 10px red;
+    }
+
+    .flip-display {
+      font-size: 3em;
+      font-weight: bold;
+      color: #000;
+      background: #333;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      font-family: 'Helvetica Neue', sans-serif;
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <!-- Configuration View -->
-  <div id="configView">
-    <h1>Salary Stopwatch App</h1>
-    <p class="description">
-      Enter your annual salary and working hours to track your earnings in real-time.
-    </p>
-    <input id="salary" type="number" placeholder="Annual Salary (£)" />
-    <input id="hours" type="number" placeholder="Hours per week" />
-    <div class="button-group">
-      <button onclick="start()">Start</button>
-    </div>
+  <h1>Salary Stopwatch App</h1>
+
+  <!-- Configuration Screen -->
+  <div id="config">
+    <p>Enter your annual salary and working hours to track your earnings in real-time.</p>
+    <input type="number" id="salary" placeholder="Annual Salary (£)" />
+    <input type="number" id="hours" placeholder="Hours per week" />
+
+    <br>
+    <select id="viewMode">
+      <option value="simple">Simple</option>
+      <option value="digital">Digital</option>
+      <option value="flip">Flip Clock</option>
+    </select>
+
+    <br>
+    <button id="start">Start</button>
   </div>
 
-  <!-- Stopwatch View -->
-  <div id="stopwatchView" class="hidden">
-    <div id="display">£0.00</div>
-    <div class="button-group">
-      <button onclick="reset()">Reset</button>
-    </div>
+  <!-- Stopwatch Screen -->
+  <div id="stopwatch" class="hidden">
+    <div id="earnings" class="simple-display">£0.00</div>
+    <br><br>
+    <button id="reset">Reset</button>
   </div>
 
   <script>
+    const startBtn = document.getElementById('start');
+    const resetBtn = document.getElementById('reset');
+    const config = document.getElementById('config');
+    const stopwatch = document.getElementById('stopwatch');
+    const earnings = document.getElementById('earnings');
+    const salaryInput = document.getElementById('salary');
+    const hoursInput = document.getElementById('hours');
+    const viewMode = document.getElementById('viewMode');
+
     let interval;
-    let earnings = 0;
-    let perSecond = 0;
+    let earningsPerSecond = 0;
+    let currentEarnings = 0;
 
-    function getPerSecondSalary() {
-      const salary = parseFloat(document.getElementById('salary').value);
-      const hours = parseFloat(document.getElementById('hours').value);
-      if (!salary || !hours) return 0;
-      return salary / (hours * 3600 * 52);
-    }
+    startBtn.addEventListener('click', () => {
+      const salary = parseFloat(salaryInput.value);
+      const hours = parseFloat(hoursInput.value);
 
-    function updateDisplay() {
-      document.getElementById('display').innerText = "£" + earnings.toFixed(2);
-    }
+      if (!salary || !hours) return;
 
-    function start() {
-      perSecond = getPerSecondSalary();
-      if (perSecond === 0) return alert('Please enter valid salary and hours.');
+      const secondsPerYear = hours * 3600 * 52;
+      earningsPerSecond = salary / secondsPerYear;
 
-      document.getElementById('configView').classList.add('hidden');
-      document.getElementById('stopwatchView').classList.remove('hidden');
+      const selectedMode = viewMode.value;
+      earnings.className = selectedMode + "-display";
+
+      config.classList.add('hidden');
+      stopwatch.classList.remove('hidden');
 
       interval = setInterval(() => {
-        earnings += perSecond;
-        updateDisplay();
+        currentEarnings += earningsPerSecond;
+        earnings.innerText = '£' + currentEarnings.toFixed(2);
       }, 1000);
-    }
+    });
 
-    function reset() {
+    resetBtn.addEventListener('click', () => {
       clearInterval(interval);
-      interval = null;
-      earnings = 0;
-      updateDisplay();
-      document.getElementById('salary').value = '';
-      document.getElementById('hours').value = '';
-      document.getElementById('stopwatchView').classList.add('hidden');
-      document.getElementById('configView').classList.remove('hidden');
-    }
+      currentEarnings = 0;
+      earnings.innerText = "£0.00";
+
+      stopwatch.classList.add('hidden');
+      config.classList.remove('hidden');
+    });
   </script>
 </body>
 </html>
-
