@@ -1,271 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Salary Stopwatch App</title>
   <style>
-    :root {
-      --bg: #f9f9f9;
-      --fg: #000;
-      --accent: #007bff;
-    }
-
-    [data-theme='dark'] {
-      --bg: #1a1a1a;
-      --fg: #f1f1f1;
-      --accent: #4dabf7;
-    }
-
     body {
       font-family: Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--fg);
+      background-color: #f7f7f7;
+      color: #000;
       text-align: center;
-      padding: 30px;
-      transition: background 0.3s, color 0.3s;
+      margin: 0;
+      padding: 20px;
     }
 
-    .hidden { display: none; }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
+    h1 {
+      margin-bottom: 10px;
     }
 
-    input, select, label {
+    .config-section {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    select,
+    input[type="number"],
+    input[type="time"] {
       width: 100%;
       padding: 10px;
-      margin: 8px 0;
-      font-size: 16px;
-      background: #fff;
-      color: #000;
-      border: 1px solid #ccc;
+      margin: 10px 0;
       border-radius: 4px;
+      border: 1px solid #ccc;
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 10px 5px;
+    .day-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+    }
+
+    .day-row input[type="time"] {
+      width: 45%;
+    }
+
+    .day-toggle {
+      margin-bottom: 10px;
+    }
+
+    .day-toggle button {
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      margin: 0 2px;
+      background-color: #ddd;
+      color: #000;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    .flip-clock-wrapper {
-      display: flex;
-      justify-content: center;
-      font-size: 48px;
-      margin-top: 30px;
-    }
-
-    .flip-digit {
-      margin: 0 2px;
-    }
-
-    .flip-card {
-      display: inline-block;
-      position: relative;
-      width: 40px;
-      height: 60px;
-      background: #333;
+    .day-toggle button.active {
+      background-color: #3366ff;
       color: #fff;
-      border-radius: 5px;
-      font-size: 48px;
-      line-height: 60px;
     }
 
-    .digital-display {
-      font-family: 'Courier New', monospace;
-      font-size: 3em;
-      color: red;
-      background: black;
-      padding: 20px;
-      border-radius: 8px;
-      display: inline-block;
+    #startButton,
+    #resetButton {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
     }
 
-    .simple-display {
-      font-size: 3em;
+    #counter {
+      font-size: 36px;
       font-weight: bold;
       color: green;
+      margin-top: 20px;
     }
 
-    .toggle-row {
-      display: flex;
-      justify-content: space-between;
-      margin: 15px 0;
-    }
-
-    .celebration {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2em;
-      animation: pop 1s ease-in-out;
-    }
-
-    @keyframes pop {
-      0% { transform: translate(-50%, -100px); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translate(-50%, 20px); opacity: 0; }
+    #earningsBreakdown {
+      margin-top: 20px;
+      font-size: 18px;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="toggle-row">
-      <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
-      <label><input type="checkbox" id="focusToggle"> Focus Mode</label>
+  <div class="config-section">
+    <h1>Salary Stopwatch App</h1>
+
+    <label for="setupType">Choose Setup:</label>
+    <select id="setupType">
+      <option value="simple">Simple Setup</option>
+      <option value="advanced">Advanced Setup</option>
+    </select>
+
+    <div id="simpleSetup">
+      <input id="salaryInput" type="number" placeholder="Annual Salary (£)" />
+      <input id="hoursInput" type="number" placeholder="Hours per week" />
     </div>
 
-    <div id="config">
-      <h1>Salary Stopwatch App</h1>
-      <label for="setupType">Choose Setup:</label>
-      <select id="setupType">
-        <option value="simple">Simple Setup</option>
-        <option value="advanced">Advanced Setup</option>
-      </select>
-
-      <label for="salary">Annual Salary (£):</label>
-      <input type="number" id="salary" aria-label="Annual Salary">
-
-      <div id="simpleFields">
-        <label for="hours">Hours per week:</label>
-        <input type="number" id="hours" aria-label="Hours per week">
+    <div id="advancedSetup" style="display: none;">
+      <label>Enable Working Days:</label>
+      <div class="day-toggle">
+        <button class="day-btn" data-day="0">M</button>
+        <button class="day-btn" data-day="1">T</button>
+        <button class="day-btn" data-day="2">W</button>
+        <button class="day-btn" data-day="3">T</button>
+        <button class="day-btn" data-day="4">F</button>
+        <button class="day-btn" data-day="5">S</button>
+        <button class="day-btn" data-day="6">S</button>
       </div>
-
-      <div id="advancedFields" class="hidden">
-        <p>Enter working hours per day:</p>
-        <div id="dayInputs"></div>
+      <div id="workingHours">
+        <div class="day-row" data-day="0">
+          Monday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
+        <div class="day-row" data-day="1">
+          Tuesday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
+        <div class="day-row" data-day="2">
+          Wednesday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
+        <div class="day-row" data-day="3">
+          Thursday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
+        <div class="day-row" data-day="4">
+          Friday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
+        <div class="day-row" data-day="5">
+          Saturday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
+        <div class="day-row" data-day="6">
+          Sunday: <input type="time" class="start" /> to <input type="time" class="end" />
+        </div>
       </div>
-
-      <label for="mode">View Mode:</label>
-      <select id="mode">
-        <option value="simple">Simple</option>
-        <option value="digital">Digital</option>
-        <option value="flipclock">Flip Clock</option>
-      </select>
-
-      <button onclick="startApp()">Start</button>
     </div>
 
-    <div id="stopwatch" class="hidden">
-      <div id="display" class="simple-display">£0.00</div>
-      <div id="breakdown" class="hidden">
-        <p><strong>Today:</strong> £<span id="today"></span></p>
-        <p><strong>This Week:</strong> £<span id="week"></span></p>
-        <p><strong>This Month:</strong> £<span id="month"></span></p>
-        <p><strong>This Year:</strong> £<span id="year"></span></p>
-      </div>
-      <br><br>
-      <button onclick="resetApp()">Reset</button>
-    </div>
+    <label for="viewMode">View Mode:</label>
+    <select id="viewMode">
+      <option value="simple">Simple</option>
+      <option value="digital">Digital</option>
+      <option value="flip">Flip Clock</option>
+    </select>
+
+    <button id="startButton">Start</button>
+  </div>
+
+  <div id="mainView" style="display: none;">
+    <div id="counter">£0.00</div>
+    <div id="earningsBreakdown"></div>
+    <button id="resetButton">Reset</button>
   </div>
 
   <script>
-    const setupType = document.getElementById('setupType');
-    const simpleFields = document.getElementById('simpleFields');
-    const advancedFields = document.getElementById('advancedFields');
-    const dayInputs = document.getElementById('dayInputs');
-    const config = document.getElementById('config');
-    const stopwatch = document.getElementById('stopwatch');
-    const display = document.getElementById('display');
-    const breakdown = document.getElementById('breakdown');
-    const darkToggle = document.getElementById('darkModeToggle');
-    const focusToggle = document.getElementById('focusToggle');
-
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-    days.forEach(day => {
-      const row = document.createElement('div');
-      row.innerHTML = `
-        <label>${day} Start:</label>
-        <input type="time" id="${day}-start">
-        <label>${day} End:</label>
-        <input type="time" id="${day}-end">
-      `;
-      dayInputs.appendChild(row);
+    // Enable/disable working day buttons
+    document.querySelectorAll('.day-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+      });
     });
 
-    setupType.addEventListener('change', () => {
-      if (setupType.value === 'advanced') {
-        simpleFields.classList.add('hidden');
-        advancedFields.classList.remove('hidden');
-        breakdown.classList.remove('hidden');
+    // Toggle setup views
+    document.getElementById('setupType').addEventListener('change', function () {
+      const simple = document.getElementById('simpleSetup');
+      const advanced = document.getElementById('advancedSetup');
+      if (this.value === 'advanced') {
+        simple.style.display = 'none';
+        advanced.style.display = 'block';
       } else {
-        simpleFields.classList.remove('hidden');
-        advancedFields.classList.add('hidden');
-        breakdown.classList.add('hidden');
+        simple.style.display = 'block';
+        advanced.style.display = 'none';
       }
     });
 
-    darkToggle.addEventListener('change', () => {
-      document.documentElement.setAttribute('data-theme', darkToggle.checked ? 'dark' : 'light');
+    // Placeholder logic for Start and Reset
+    document.getElementById('startButton').addEventListener('click', function () {
+      document.querySelector('.config-section').style.display = 'none';
+      document.getElementById('mainView').style.display = 'block';
     });
 
-    focusToggle.addEventListener('change', () => {
-      config.classList.toggle('hidden', focusToggle.checked);
+    document.getElementById('resetButton').addEventListener('click', function () {
+      document.getElementById('mainView').style.display = 'none';
+      document.querySelector('.config-section').style.display = 'block';
     });
-
-    let startTime = null;
-    let earnings = 0;
-
-    function startApp() {
-      config.classList.add('hidden');
-      stopwatch.classList.remove('hidden');
-      startTime = performance.now();
-
-      const salary = parseFloat(document.getElementById('salary').value);
-      const hours = setupType.value === 'simple' ? parseFloat(document.getElementById('hours').value) : 37.5;
-      const perSecond = salary / (hours * 52 * 3600);
-
-      function update() {
-        const now = performance.now();
-        const secondsElapsed = (now - startTime) / 1000;
-        earnings = secondsElapsed * perSecond;
-
-        const value = earnings.toFixed(2);
-        const mode = document.getElementById('mode').value;
-
-        if (mode === 'flipclock') {
-          display.className = 'flip-clock-wrapper';
-          const chars = ('£' + value).split('');
-          display.innerHTML = chars.map(c => `
-            <div class="flip-digit"><div class="flip-card">${c}</div></div>
-          `).join('');
-        } else if (mode === 'digital') {
-          display.className = 'digital-display';
-          display.innerText = '£' + value;
-        } else {
-          display.className = 'simple-display';
-          display.innerText = '£' + value;
-        }
-
-        document.getElementById('today').innerText = value;
-        document.getElementById('week').innerText = (earnings * 5).toFixed(2);
-        document.getElementById('month').innerText = (earnings * 20).toFixed(2);
-        document.getElementById('year').innerText = (earnings * 260).toFixed(2);
-
-        requestAnimationFrame(update);
-      }
-
-      update();
-
-      // Celebration
-      const currentHour = new Date().getHours();
-      if (currentHour >= 17 && setupType.value === 'advanced') {
-        const graphics = ['🎉 Great work!', '🦄 Unicorn time!', '🍾 You did it!'];
-        const el = document.createElement('div');
-        el.className = 'celebration';
-        el.innerText = graphics[Math.floor(Math.random() * graphics.length)];
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 4000);
-      }
-    }
-
-    function resetApp() {
-      location.reload();
-    }
   </script>
 </body>
+
 </html>
+
