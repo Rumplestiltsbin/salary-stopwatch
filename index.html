@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,212 +8,201 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+      margin: 20px;
       background-color: #f9f9f9;
       color: #333;
     }
     .dark-mode {
-      background-color: #111;
-      color: #f1f1f1;
+      background-color: #121212;
+      color: #f0f0f0;
     }
-    .container {
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .dark-mode .container {
-      background-color: #222;
-    }
-    h1, label, select, input {
-      display: block;
-      margin-bottom: 15px;
-      width: 100%;
-    }
-    input, select {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px 5px 0 0;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .earnings-display {
+    h1 {
       font-size: 2em;
-      font-weight: bold;
-      color: green;
-      text-align: center;
-      margin-top: 30px;
-    }
-    .toggle-switch {
-      margin-top: 20px;
-    }
-    .working-hours-day {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .working-hours-day input {
-      width: 45%;
-    }
-    .weekday-toggle {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 10px;
-    }
-    .weekday-toggle button {
-      padding: 6px 10px;
-      border-radius: 50%;
-      border: 1px solid #ccc;
-      background-color: #eee;
-      cursor: pointer;
-    }
-    .weekday-toggle button.active {
-      background-color: #007bff;
-      color: white;
     }
     .hidden {
       display: none;
     }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select, button {
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 1em;
+    }
+    .working-day-toggle span {
+      display: inline-block;
+      margin-right: 5px;
+      padding: 5px 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      background-color: #e0e0e0;
+    }
+    .working-day-toggle span.active {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .working-hours-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .working-hours-row input[type="time"] {
+      margin: 0 10px;
+    }
+    #output {
+      font-size: 2em;
+      font-weight: bold;
+      color: green;
+    }
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   </style>
 </head>
+
 <body>
-  <div class="container">
+  <div id="setup-section">
     <h1>Salary Stopwatch App</h1>
-    <label for="setupType">Choose Setup:</label>
-    <select id="setupType">
+    <label for="setup-mode">Choose Setup:</label>
+    <select id="setup-mode">
       <option value="simple">Simple Setup</option>
       <option value="advanced">Advanced Setup</option>
     </select>
 
-    <div id="simpleSetup">
+    <div id="salary-input">
       <label for="salary">Annual Salary (£):</label>
-      <input type="number" id="salary" placeholder="52000" />
-
-      <label for="hoursPerWeek">Hours per week:</label>
-      <input type="number" id="hoursPerWeek" placeholder="37.5" />
+      <input type="number" id="salary" placeholder="e.g. 52000" />
     </div>
 
-    <div id="advancedSetup" class="hidden">
+    <div id="simple-hours">
+      <label for="hours">Hours per week:</label>
+      <input type="number" id="hours" placeholder="e.g. 40" />
+    </div>
+
+    <div id="advanced-setup" class="hidden">
       <label>Enable working hours:</label>
-      <div class="weekday-toggle" id="weekdayButtons"></div>
-      <div id="hoursContainer"></div>
+      <div class="working-day-toggle" id="day-toggle">
+        <span data-day="0">M</span>
+        <span data-day="1">T</span>
+        <span data-day="2">W</span>
+        <span data-day="3">T</span>
+        <span data-day="4">F</span>
+        <span data-day="5">S</span>
+        <span data-day="6">S</span>
+      </div>
+      <div id="working-hours"></div>
     </div>
 
-    <label for="viewMode">View Mode:</label>
-    <select id="viewMode">
+    <label for="view-mode">View Mode:</label>
+    <select id="view-mode">
       <option value="simple">Simple</option>
       <option value="digital">Digital</option>
       <option value="flip">Flip Clock</option>
     </select>
 
-    <div class="toggle-switch">
-      <label>
-        <input type="checkbox" id="darkModeToggle" /> Toggle Dark Mode
-      </label>
+    <div class="flex-row">
+      <input type="checkbox" id="dark-mode-toggle" />
+      <label for="dark-mode-toggle">Toggle Dark Mode</label>
     </div>
 
-    <button id="startButton">Start</button>
-    <button id="resetButton" class="hidden">Reset</button>
+    <button onclick="startApp()">Start</button>
+  </div>
 
-    <div id="earningsDisplay" class="earnings-display hidden">
-      £0.00
-    </div>
+  <div id="earnings-section" class="hidden">
+    <h1>Live Earnings</h1>
+    <div id="output">£0.00</div>
+    <button onclick="resetApp()">Reset</button>
   </div>
 
   <script>
-    const setupType = document.getElementById('setupType');
-    const simpleSetup = document.getElementById('simpleSetup');
-    const advancedSetup = document.getElementById('advancedSetup');
-    const weekdayButtons = document.getElementById('weekdayButtons');
-    const hoursContainer = document.getElementById('hoursContainer');
-    const darkToggle = document.getElementById('darkModeToggle');
-    const startButton = document.getElementById('startButton');
-    const resetButton = document.getElementById('resetButton');
-    const earningsDisplay = document.getElementById('earningsDisplay');
-    const container = document.querySelector('body');
+    const setupMode = document.getElementById('setup-mode');
+    const salaryInput = document.getElementById('salary-input');
+    const simpleHours = document.getElementById('simple-hours');
+    const advancedSetup = document.getElementById('advanced-setup');
+    const dayToggle = document.getElementById('day-toggle');
+    const workingHours = document.getElementById('working-hours');
 
-    const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    const fullDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    const activeDays = new Set(['Monday','Tuesday','Wednesday','Thursday','Friday']);
+    setupMode.addEventListener('change', () => {
+      const isAdvanced = setupMode.value === 'advanced';
+      simpleHours.classList.toggle('hidden', isAdvanced);
+      advancedSetup.classList.toggle('hidden', !isAdvanced);
+    });
 
-    function renderDays() {
-      weekdayButtons.innerHTML = '';
-      fullDays.forEach((day, i) => {
-        const btn = document.createElement('button');
-        btn.textContent = weekdays[i];
-        btn.classList.toggle('active', activeDays.has(day));
-        btn.onclick = () => {
-          if (activeDays.has(day)) activeDays.delete(day);
-          else activeDays.add(day);
-          renderDays();
-          renderHours();
-        };
-        weekdayButtons.appendChild(btn);
-      });
-    }
+    const selectedDays = new Set([0, 1, 2, 3, 4]); // Default to Mon–Fri
 
-    function renderHours() {
-      hoursContainer.innerHTML = '';
-      fullDays.forEach(day => {
-        if (activeDays.has(day)) {
-          const row = document.createElement('div');
-          row.className = 'working-hours-day';
-          row.innerHTML = `
-            <label style="flex:1">${day}</label>
-            <input type="time" id="${day}-start" value="07:30" />
-            <input type="time" id="${day}-end" value="17:00" />
-          `;
-          hoursContainer.appendChild(row);
+    dayToggle.querySelectorAll('span').forEach(span => {
+      const day = +span.dataset.day;
+      if (selectedDays.has(day)) span.classList.add('active');
+
+      span.addEventListener('click', () => {
+        span.classList.toggle('active');
+        if (selectedDays.has(day)) {
+          selectedDays.delete(day);
+        } else {
+          selectedDays.add(day);
         }
+        renderWorkingHours();
+      });
+    });
+
+    function renderWorkingHours() {
+      workingHours.innerHTML = '';
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      [...selectedDays].sort().forEach(day => {
+        const row = document.createElement('div');
+        row.className = 'working-hours-row';
+        row.innerHTML = `
+          <label>${days[day]}</label>
+          <input type="time" value="07:30" id="start-${day}" /> to
+          <input type="time" value="17:00" id="end-${day}" />
+        `;
+        workingHours.appendChild(row);
       });
     }
 
-    setupType.onchange = () => {
-      if (setupType.value === 'advanced') {
-        simpleSetup.classList.add('hidden');
-        advancedSetup.classList.remove('hidden');
-      } else {
-        simpleSetup.classList.remove('hidden');
-        advancedSetup.classList.add('hidden');
+    renderWorkingHours();
+
+    document.getElementById('dark-mode-toggle').addEventListener('change', (e) => {
+      document.body.classList.toggle('dark-mode', e.target.checked);
+    });
+
+    function startApp() {
+      document.getElementById('setup-section').classList.add('hidden');
+      document.getElementById('earnings-section').classList.remove('hidden');
+      startEarningTimer();
+    }
+
+    function resetApp() {
+      document.getElementById('setup-section').classList.remove('hidden');
+      document.getElementById('earnings-section').classList.add('hidden');
+      document.getElementById('output').textContent = '£0.00';
+      if (window.earningTimer) cancelAnimationFrame(window.earningTimer);
+    }
+
+    let lastTimestamp = null;
+    let totalEarnings = 0;
+
+    function startEarningTimer() {
+      const salary = parseFloat(document.getElementById('salary').value);
+      const hoursPerWeek = setupMode.value === 'advanced' ? 40 : parseFloat(document.getElementById('hours').value);
+      const earningsPerMs = salary / (hoursPerWeek * 3600000 * 52);
+
+      function update(timestamp) {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const delta = timestamp - lastTimestamp;
+        lastTimestamp = timestamp;
+        totalEarnings += delta * earningsPerMs;
+        document.getElementById('output').textContent = '£' + totalEarnings.toFixed(2);
+        window.earningTimer = requestAnimationFrame(update);
       }
-    };
 
-    darkToggle.onchange = () => {
-      container.classList.toggle('dark-mode', darkToggle.checked);
-    };
-
-    startButton.onclick = () => {
-      document.querySelector('.container').classList.add('hidden');
-      earningsDisplay.classList.remove('hidden');
-      resetButton.classList.remove('hidden');
-      // Timer logic goes here (omitted for brevity)
-    };
-
-    resetButton.onclick = () => {
-      document.querySelector('.container').classList.remove('hidden');
-      earningsDisplay.classList.add('hidden');
-      resetButton.classList.add('hidden');
-    };
-
-    // Init
-    renderDays();
-    renderHours();
+      window.earningTimer = requestAnimationFrame(update);
+    }
   </script>
 </body>
+
 </html>
-
-
