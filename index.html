@@ -5,34 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Salary Stopwatch App</title>
   <style>
+    :root {
+      --bg: #f9f9f9;
+      --fg: #000;
+      --accent: #007bff;
+    }
+
+    [data-theme='dark'] {
+      --bg: #1a1a1a;
+      --fg: #f1f1f1;
+      --accent: #4dabf7;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      color: #000;
+      background-color: var(--bg);
+      color: var(--fg);
       text-align: center;
       padding: 30px;
+      transition: background 0.3s, color 0.3s;
     }
 
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
 
     .container {
-      max-width: 400px;
+      max-width: 500px;
       margin: auto;
     }
 
-    input, select {
+    input, select, label {
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
+      padding: 10px;
+      margin: 8px 0;
       font-size: 16px;
+      background: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
     button {
       padding: 10px 20px;
-      font-size: 18px;
-      margin: 5px;
+      font-size: 16px;
+      margin: 10px 5px;
       cursor: pointer;
     }
 
@@ -40,12 +55,10 @@
       display: flex;
       justify-content: center;
       font-size: 48px;
-      font-weight: bold;
-      margin-top: 40px;
+      margin-top: 30px;
     }
 
     .flip-digit {
-      perspective: 1000px;
       margin: 0 2px;
     }
 
@@ -54,35 +67,11 @@
       position: relative;
       width: 40px;
       height: 60px;
-      line-height: 60px;
       background: #333;
       color: #fff;
       border-radius: 5px;
-      overflow: hidden;
-    }
-
-    .flip-card::before,
-    .flip-card::after {
-      content: attr(data-digit);
-      position: absolute;
-      width: 100%;
-      height: 50%;
-      left: 0;
-      background: #333;
-      color: #fff;
-      backface-visibility: hidden;
-    }
-
-    .flip-card::before {
-      top: 0;
-      border-bottom: 1px solid #222;
-    }
-
-    .flip-card::after {
-      bottom: 0;
-      line-height: 0;
-      border-top: 1px solid #222;
-      transform: rotateX(180deg);
+      font-size: 48px;
+      line-height: 60px;
     }
 
     .digital-display {
@@ -93,8 +82,6 @@
       padding: 20px;
       border-radius: 8px;
       display: inline-block;
-      letter-spacing: 4px;
-      box-shadow: 0 0 10px red;
     }
 
     .simple-display {
@@ -102,93 +89,182 @@
       font-weight: bold;
       color: green;
     }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+    }
+
+    .celebration {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2em;
+      animation: pop 1s ease-in-out;
+    }
+
+    @keyframes pop {
+      0% { transform: translate(-50%, -100px); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(-50%, 20px); opacity: 0; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="toggle-row">
+      <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
+      <label><input type="checkbox" id="focusToggle"> Focus Mode</label>
+    </div>
+
     <div id="config">
       <h1>Salary Stopwatch App</h1>
-      <p>Enter your annual salary and working hours to track your earnings in real-time.</p>
-      <input type="number" id="salary" placeholder="Annual Salary (£)">
-      <input type="number" id="hours" placeholder="Hours per week">
+      <label for="setupType">Choose Setup:</label>
+      <select id="setupType">
+        <option value="simple">Simple Setup</option>
+        <option value="advanced">Advanced Setup</option>
+      </select>
+
+      <label for="salary">Annual Salary (£):</label>
+      <input type="number" id="salary" aria-label="Annual Salary">
+
+      <div id="simpleFields">
+        <label for="hours">Hours per week:</label>
+        <input type="number" id="hours" aria-label="Hours per week">
+      </div>
+
+      <div id="advancedFields" class="hidden">
+        <p>Enter working hours per day:</p>
+        <div id="dayInputs"></div>
+      </div>
+
+      <label for="mode">View Mode:</label>
       <select id="mode">
         <option value="simple">Simple</option>
         <option value="digital">Digital</option>
         <option value="flipclock">Flip Clock</option>
       </select>
+
       <button onclick="startApp()">Start</button>
     </div>
 
     <div id="stopwatch" class="hidden">
       <div id="display" class="simple-display">£0.00</div>
+      <div id="breakdown" class="hidden">
+        <p><strong>Today:</strong> £<span id="today"></span></p>
+        <p><strong>This Week:</strong> £<span id="week"></span></p>
+        <p><strong>This Month:</strong> £<span id="month"></span></p>
+        <p><strong>This Year:</strong> £<span id="year"></span></p>
+      </div>
       <br><br>
       <button onclick="resetApp()">Reset</button>
     </div>
   </div>
 
   <script>
-    let timer;
-    let earnings = 0;
-    let salary, hours, mode;
+    const setupType = document.getElementById('setupType');
+    const simpleFields = document.getElementById('simpleFields');
+    const advancedFields = document.getElementById('advancedFields');
+    const dayInputs = document.getElementById('dayInputs');
+    const config = document.getElementById('config');
+    const stopwatch = document.getElementById('stopwatch');
+    const display = document.getElementById('display');
+    const breakdown = document.getElementById('breakdown');
+    const darkToggle = document.getElementById('darkModeToggle');
+    const focusToggle = document.getElementById('focusToggle');
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedSalary = localStorage.getItem('salary');
-      const savedHours = localStorage.getItem('hours');
-      const savedMode = localStorage.getItem('mode');
-
-      if (savedSalary) document.getElementById('salary').value = savedSalary;
-      if (savedHours) document.getElementById('hours').value = savedHours;
-      if (savedMode) document.getElementById('mode').value = savedMode;
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    days.forEach(day => {
+      const row = document.createElement('div');
+      row.innerHTML = `
+        <label>${day} Start:</label>
+        <input type="time" id="${day}-start">
+        <label>${day} End:</label>
+        <input type="time" id="${day}-end">
+      `;
+      dayInputs.appendChild(row);
     });
 
+    setupType.addEventListener('change', () => {
+      if (setupType.value === 'advanced') {
+        simpleFields.classList.add('hidden');
+        advancedFields.classList.remove('hidden');
+        breakdown.classList.remove('hidden');
+      } else {
+        simpleFields.classList.remove('hidden');
+        advancedFields.classList.add('hidden');
+        breakdown.classList.add('hidden');
+      }
+    });
+
+    darkToggle.addEventListener('change', () => {
+      document.documentElement.setAttribute('data-theme', darkToggle.checked ? 'dark' : 'light');
+    });
+
+    focusToggle.addEventListener('change', () => {
+      config.classList.toggle('hidden', focusToggle.checked);
+    });
+
+    let startTime = null;
+    let earnings = 0;
+
     function startApp() {
-      salary = parseFloat(document.getElementById('salary').value);
-      hours = parseFloat(document.getElementById('hours').value);
-      mode = document.getElementById('mode').value;
+      config.classList.add('hidden');
+      stopwatch.classList.remove('hidden');
+      startTime = performance.now();
 
-      if (!salary || !hours) return;
+      const salary = parseFloat(document.getElementById('salary').value);
+      const hours = setupType.value === 'simple' ? parseFloat(document.getElementById('hours').value) : 37.5;
+      const perSecond = salary / (hours * 52 * 3600);
 
-      // Save to localStorage
-      localStorage.setItem('salary', salary);
-      localStorage.setItem('hours', hours);
-      localStorage.setItem('mode', mode);
+      function update() {
+        const now = performance.now();
+        const secondsElapsed = (now - startTime) / 1000;
+        earnings = secondsElapsed * perSecond;
 
-      document.getElementById('config').classList.add('hidden');
-      document.getElementById('stopwatch').classList.remove('hidden');
+        const value = earnings.toFixed(2);
+        const mode = document.getElementById('mode').value;
 
-      let perSecond = salary / (hours * 52 * 3600);
-      timer = setInterval(() => {
-        earnings += perSecond;
-        updateDisplay(earnings.toFixed(2));
-      }, 1000);
+        if (mode === 'flipclock') {
+          display.className = 'flip-clock-wrapper';
+          const chars = ('£' + value).split('');
+          display.innerHTML = chars.map(c => `
+            <div class="flip-digit"><div class="flip-card">${c}</div></div>
+          `).join('');
+        } else if (mode === 'digital') {
+          display.className = 'digital-display';
+          display.innerText = '£' + value;
+        } else {
+          display.className = 'simple-display';
+          display.innerText = '£' + value;
+        }
+
+        document.getElementById('today').innerText = value;
+        document.getElementById('week').innerText = (earnings * 5).toFixed(2);
+        document.getElementById('month').innerText = (earnings * 20).toFixed(2);
+        document.getElementById('year').innerText = (earnings * 260).toFixed(2);
+
+        requestAnimationFrame(update);
+      }
+
+      update();
+
+      // Celebration
+      const currentHour = new Date().getHours();
+      if (currentHour >= 17 && setupType.value === 'advanced') {
+        const graphics = ['🎉 Great work!', '🦄 Unicorn time!', '🍾 You did it!'];
+        const el = document.createElement('div');
+        el.className = 'celebration';
+        el.innerText = graphics[Math.floor(Math.random() * graphics.length)];
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
     }
 
     function resetApp() {
-      clearInterval(timer);
-      earnings = 0;
-      document.getElementById('stopwatch').classList.add('hidden');
-      document.getElementById('config').classList.remove('hidden');
-      document.getElementById('display').innerHTML = '£0.00';
-    }
-
-    function updateDisplay(value) {
-      const display = document.getElementById('display');
-
-      if (mode === 'flipclock') {
-        const digits = value.padStart(6, '0').replace('.', '').split('');
-        display.className = 'flip-clock-wrapper';
-        display.innerHTML = digits.map(d => `
-          <div class="flip-digit">
-            <div class="flip-card" data-digit="${d}"></div>
-          </div>
-        `).join('');
-      } else if (mode === 'digital') {
-        display.className = 'digital-display';
-        display.innerText = '£' + value;
-      } else {
-        display.className = 'simple-display';
-        display.innerText = '£' + value;
-      }
+      location.reload();
     }
   </script>
 </body>
