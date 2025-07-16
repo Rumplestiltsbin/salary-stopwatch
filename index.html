@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,201 +7,134 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f9f9f9;
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
       color: #333;
-    }
-    .dark-mode {
-      background-color: #121212;
-      color: #f0f0f0;
-    }
-    h1 {
-      font-size: 2em;
     }
     .hidden {
       display: none;
     }
-    label {
+    #setupPage, #earningsPage {
+      max-width: 400px;
+      margin: auto;
+    }
+    label, select, input {
       display: block;
-      margin: 10px 0 5px;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
     }
-    input, select, button {
-      margin-bottom: 10px;
-      padding: 8px;
-      font-size: 1em;
+    button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      font-size: 16px;
     }
-    .working-day-toggle span {
-      display: inline-block;
-      margin-right: 5px;
-      padding: 5px 10px;
-      border-radius: 50%;
-      cursor: pointer;
-      background-color: #e0e0e0;
-    }
-    .working-day-toggle span.active {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .working-hours-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    .working-hours-row input[type="time"] {
-      margin: 0 10px;
-    }
-    #output {
+    #earningsDisplay {
       font-size: 2em;
       font-weight: bold;
-      color: green;
+      margin-top: 20px;
     }
-    .flex-row {
+    .dark-mode {
+      background-color: #121212;
+      color: #f5f5f5;
+    }
+    .dark-mode input,
+    .dark-mode select,
+    .dark-mode button {
+      background-color: #333;
+      color: #f5f5f5;
+      border: 1px solid #555;
+    }
+    .dark-mode #earningsDisplay {
+      color: #90ee90;
+    }
+    .toggle-container {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
-
 <body>
-  <div id="setup-section">
+  <div id="setupPage">
     <h1>Salary Stopwatch App</h1>
-    <label for="setup-mode">Choose Setup:</label>
-    <select id="setup-mode">
-      <option value="simple">Simple Setup</option>
-      <option value="advanced">Advanced Setup</option>
-    </select>
+    <label for="salary">Annual Salary (£):</label>
+    <input type="number" id="salary" placeholder="Enter Annual Salary" />
 
-    <div id="salary-input">
-      <label for="salary">Annual Salary (£):</label>
-      <input type="number" id="salary" placeholder="e.g. 52000" />
-    </div>
+    <label for="hoursPerWeek">Hours per week:</label>
+    <input type="number" id="hoursPerWeek" placeholder="Enter Hours per week" />
 
-    <div id="simple-hours">
-      <label for="hours">Hours per week:</label>
-      <input type="number" id="hours" placeholder="e.g. 40" />
-    </div>
-
-    <div id="advanced-setup" class="hidden">
-      <label>Enable working hours:</label>
-      <div class="working-day-toggle" id="day-toggle">
-        <span data-day="0">M</span>
-        <span data-day="1">T</span>
-        <span data-day="2">W</span>
-        <span data-day="3">T</span>
-        <span data-day="4">F</span>
-        <span data-day="5">S</span>
-        <span data-day="6">S</span>
-      </div>
-      <div id="working-hours"></div>
-    </div>
-
-    <label for="view-mode">View Mode:</label>
-    <select id="view-mode">
+    <label for="viewMode">View Mode:</label>
+    <select id="viewMode">
       <option value="simple">Simple</option>
       <option value="digital">Digital</option>
       <option value="flip">Flip Clock</option>
     </select>
 
-    <div class="flex-row">
-      <input type="checkbox" id="dark-mode-toggle" />
-      <label for="dark-mode-toggle">Toggle Dark Mode</label>
+    <div class="toggle-container">
+      <input type="checkbox" id="darkModeToggle" />
+      <label for="darkModeToggle">Toggle Dark Mode</label>
     </div>
 
     <button onclick="startApp()">Start</button>
   </div>
 
-  <div id="earnings-section" class="hidden">
-    <h1>Live Earnings</h1>
-    <div id="output">£0.00</div>
+  <div id="earningsPage" class="hidden">
+    <div id="earningsDisplay">£0.00</div>
     <button onclick="resetApp()">Reset</button>
   </div>
 
   <script>
-    const setupMode = document.getElementById('setup-mode');
-    const salaryInput = document.getElementById('salary-input');
-    const simpleHours = document.getElementById('simple-hours');
-    const advancedSetup = document.getElementById('advanced-setup');
-    const dayToggle = document.getElementById('day-toggle');
-    const workingHours = document.getElementById('working-hours');
-
-    setupMode.addEventListener('change', () => {
-      const isAdvanced = setupMode.value === 'advanced';
-      simpleHours.classList.toggle('hidden', isAdvanced);
-      advancedSetup.classList.toggle('hidden', !isAdvanced);
-    });
-
-    const selectedDays = new Set([0, 1, 2, 3, 4]); // Default to Mon–Fri
-
-    dayToggle.querySelectorAll('span').forEach(span => {
-      const day = +span.dataset.day;
-      if (selectedDays.has(day)) span.classList.add('active');
-
-      span.addEventListener('click', () => {
-        span.classList.toggle('active');
-        if (selectedDays.has(day)) {
-          selectedDays.delete(day);
-        } else {
-          selectedDays.add(day);
-        }
-        renderWorkingHours();
-      });
-    });
-
-    function renderWorkingHours() {
-      workingHours.innerHTML = '';
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      [...selectedDays].sort().forEach(day => {
-        const row = document.createElement('div');
-        row.className = 'working-hours-row';
-        row.innerHTML = `
-          <label>${days[day]}</label>
-          <input type="time" value="07:30" id="start-${day}" /> to
-          <input type="time" value="17:00" id="end-${day}" />
-        `;
-        workingHours.appendChild(row);
-      });
-    }
-
-    renderWorkingHours();
-
-    document.getElementById('dark-mode-toggle').addEventListener('change', (e) => {
-      document.body.classList.toggle('dark-mode', e.target.checked);
-    });
+    let startTime;
+    let animationFrameId;
+    let lastFrameTime;
+    let earningsPerSecond;
+    let isRunning = false;
 
     function startApp() {
-      document.getElementById('setup-section').classList.add('hidden');
-      document.getElementById('earnings-section').classList.remove('hidden');
-      startEarningTimer();
+      const salary = parseFloat(document.getElementById('salary').value);
+      const hours = parseFloat(document.getElementById('hoursPerWeek').value);
+      const viewMode = document.getElementById('viewMode').value;
+
+      if (isNaN(salary) || isNaN(hours)) {
+        alert("Please enter valid salary and hours per week.");
+        return;
+      }
+
+      earningsPerSecond = salary / (hours * 3600 * 52);
+      document.getElementById("setupPage").classList.add("hidden");
+      document.getElementById("earningsPage").classList.remove("hidden");
+      startTime = performance.now();
+      lastFrameTime = startTime;
+      isRunning = true;
+      updateEarnings();
+    }
+
+    function updateEarnings(currentTime) {
+      if (!isRunning) return;
+
+      const elapsedTime = (currentTime - startTime) / 1000; // in seconds
+      const earnings = elapsedTime * earningsPerSecond;
+
+      document.getElementById("earningsDisplay").textContent = `£${earnings.toFixed(2)}`;
+      animationFrameId = requestAnimationFrame(updateEarnings);
     }
 
     function resetApp() {
-      document.getElementById('setup-section').classList.remove('hidden');
-      document.getElementById('earnings-section').classList.add('hidden');
-      document.getElementById('output').textContent = '£0.00';
-      if (window.earningTimer) cancelAnimationFrame(window.earningTimer);
+      isRunning = false;
+      cancelAnimationFrame(animationFrameId);
+      document.getElementById("setupPage").classList.remove("hidden");
+      document.getElementById("earningsPage").classList.add("hidden");
     }
 
-    let lastTimestamp = null;
-    let totalEarnings = 0;
-
-    function startEarningTimer() {
-      const salary = parseFloat(document.getElementById('salary').value);
-      const hoursPerWeek = setupMode.value === 'advanced' ? 40 : parseFloat(document.getElementById('hours').value);
-      const earningsPerMs = salary / (hoursPerWeek * 3600000 * 52);
-
-      function update(timestamp) {
-        if (!lastTimestamp) lastTimestamp = timestamp;
-        const delta = timestamp - lastTimestamp;
-        lastTimestamp = timestamp;
-        totalEarnings += delta * earningsPerMs;
-        document.getElementById('output').textContent = '£' + totalEarnings.toFixed(2);
-        window.earningTimer = requestAnimationFrame(update);
-      }
-
-      window.earningTimer = requestAnimationFrame(update);
-    }
+    // Dark Mode toggle
+    document.getElementById("darkModeToggle").addEventListener("change", function () {
+      document.body.classList.toggle("dark-mode", this.checked);
+    });
   </script>
 </body>
-
 </html>
