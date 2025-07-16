@@ -8,133 +8,169 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 20px;
-      background-color: #f5f5f5;
+      background-color: #f3f3f3;
       color: #333;
+      padding: 2rem;
     }
+
+    h1 {
+      font-size: 2rem;
+    }
+
     .hidden {
       display: none;
     }
-    #setupPage, #earningsPage {
-      max-width: 400px;
-      margin: auto;
-    }
-    label, select, input {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
+
+    input, select, button {
       padding: 10px;
-      font-size: 16px;
+      margin: 10px 0;
+      font-size: 1rem;
+      width: 80%;
+      max-width: 300px;
     }
-    button {
-      margin: 10px 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    #earningsDisplay {
-      font-size: 2em;
+
+    .counter-display {
+      font-size: 3rem;
       font-weight: bold;
-      margin-top: 20px;
+      margin-top: 2rem;
     }
-    .dark-mode {
-      background-color: #121212;
-      color: #f5f5f5;
+
+    .flip-clock, .digital-clock {
+      display: none;
+      font-size: 3rem;
+      font-weight: bold;
     }
-    .dark-mode input,
-    .dark-mode select,
-    .dark-mode button {
-      background-color: #333;
-      color: #f5f5f5;
-      border: 1px solid #555;
+
+    .flip-digit {
+      display: inline-block;
+      width: 40px;
+      height: 60px;
+      background: #000;
+      color: #fff;
+      margin: 2px;
+      font-size: 2rem;
+      line-height: 60px;
+      border-radius: 6px;
+      font-family: monospace;
     }
-    .dark-mode #earningsDisplay {
-      color: #90ee90;
-    }
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
+
+    .digital-style {
+      font-family: 'Courier New', Courier, monospace;
+      color: red;
+      background-color: black;
+      padding: 10px 20px;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <div id="setupPage">
+  <div id="config-screen">
     <h1>Salary Stopwatch App</h1>
-    <label for="salary">Annual Salary (£):</label>
-    <input type="number" id="salary" placeholder="Enter Annual Salary" />
+    <label for="setup-mode">Choose Setup:</label><br />
+    <select id="setup-mode">
+      <option value="simple">Simple Setup</option>
+    </select><br />
 
-    <label for="hoursPerWeek">Hours per week:</label>
-    <input type="number" id="hoursPerWeek" placeholder="Enter Hours per week" />
+    <input id="salary" type="number" placeholder="Annual Salary (£)" /><br />
+    <input id="hours" type="number" placeholder="Hours per week" /><br />
 
-    <label for="viewMode">View Mode:</label>
-    <select id="viewMode">
+    <label for="view-mode">View Mode:</label><br />
+    <select id="view-mode">
       <option value="simple">Simple</option>
       <option value="digital">Digital</option>
       <option value="flip">Flip Clock</option>
-    </select>
-
-    <div class="toggle-container">
-      <input type="checkbox" id="darkModeToggle" />
-      <label for="darkModeToggle">Toggle Dark Mode</label>
-    </div>
+    </select><br />
 
     <button onclick="startApp()">Start</button>
   </div>
 
-  <div id="earningsPage" class="hidden">
-    <div id="earningsDisplay">£0.00</div>
+  <div id="earning-screen" class="hidden">
+    <div id="simple-view" class="counter-display">£0.00</div>
+    <div id="digital-view" class="digital-clock digital-style">£0.00</div>
+    <div id="flip-view" class="flip-clock"></div>
     <button onclick="resetApp()">Reset</button>
   </div>
 
   <script>
+    let salary = 0;
+    let hours = 0;
+    let viewMode = 'simple';
+    let earnings = 0;
     let startTime;
-    let animationFrameId;
-    let lastFrameTime;
-    let earningsPerSecond;
-    let isRunning = false;
+    let timer;
+
+    function formatMoney(amount) {
+      return '£' + amount.toFixed(2);
+    }
+
+    function updateDisplay() {
+      const elapsed = (performance.now() - startTime) / 1000;
+      const perSecond = (salary / (hours * 3600 * 52));
+      earnings = elapsed * perSecond;
+
+      document.getElementById('simple-view').innerText = formatMoney(earnings);
+      document.getElementById('digital-view').innerText = formatMoney(earnings);
+
+      const flipView = document.getElementById('flip-view');
+      flipView.innerHTML = '';
+      const digits = formatMoney(earnings).split('');
+      digits.forEach(d => {
+        const span = document.createElement('span');
+        span.className = 'flip-digit';
+        span.textContent = d;
+        flipView.appendChild(span);
+      });
+    }
 
     function startApp() {
-      const salary = parseFloat(document.getElementById('salary').value);
-      const hours = parseFloat(document.getElementById('hoursPerWeek').value);
-      const viewMode = document.getElementById('viewMode').value;
+      salary = parseFloat(document.getElementById('salary').value);
+      hours = parseFloat(document.getElementById('hours').value);
+      viewMode = document.getElementById('view-mode').value;
 
-      if (isNaN(salary) || isNaN(hours)) {
-        alert("Please enter valid salary and hours per week.");
+      if (!salary || !hours) {
+        alert('Please enter valid salary and hours.');
         return;
       }
 
-      earningsPerSecond = salary / (hours * 3600 * 52);
-      document.getElementById("setupPage").classList.add("hidden");
-      document.getElementById("earningsPage").classList.remove("hidden");
+      // Save settings
+      localStorage.setItem('salary', salary);
+      localStorage.setItem('hours', hours);
+      localStorage.setItem('viewMode', viewMode);
+
+      document.getElementById('config-screen').classList.add('hidden');
+      document.getElementById('earning-screen').classList.remove('hidden');
+
+      document.getElementById('simple-view').style.display = 'none';
+      document.getElementById('digital-view').style.display = 'none';
+      document.getElementById('flip-view').style.display = 'none';
+
+      if (viewMode === 'simple') {
+        document.getElementById('simple-view').style.display = 'block';
+      } else if (viewMode === 'digital') {
+        document.getElementById('digital-view').style.display = 'block';
+      } else if (viewMode === 'flip') {
+        document.getElementById('flip-view').style.display = 'block';
+      }
+
+      earnings = 0;
       startTime = performance.now();
-      lastFrameTime = startTime;
-      isRunning = true;
-      updateEarnings();
-    }
-
-    function updateEarnings(currentTime) {
-      if (!isRunning) return;
-
-      const elapsedTime = (currentTime - startTime) / 1000; // in seconds
-      const earnings = elapsedTime * earningsPerSecond;
-
-      document.getElementById("earningsDisplay").textContent = `£${earnings.toFixed(2)}`;
-      animationFrameId = requestAnimationFrame(updateEarnings);
+      timer = setInterval(updateDisplay, 100);
     }
 
     function resetApp() {
-      isRunning = false;
-      cancelAnimationFrame(animationFrameId);
-      document.getElementById("setupPage").classList.remove("hidden");
-      document.getElementById("earningsPage").classList.add("hidden");
+      clearInterval(timer);
+      document.getElementById('earning-screen').classList.add('hidden');
+      document.getElementById('config-screen').classList.remove('hidden');
     }
 
-    // Dark Mode toggle
-    document.getElementById("darkModeToggle").addEventListener("change", function () {
-      document.body.classList.toggle("dark-mode", this.checked);
-    });
+    window.onload = () => {
+      const savedSalary = localStorage.getItem('salary');
+      const savedHours = localStorage.getItem('hours');
+      const savedView = localStorage.getItem('viewMode');
+      if (savedSalary) document.getElementById('salary').value = savedSalary;
+      if (savedHours) document.getElementById('hours').value = savedHours;
+      if (savedView) document.getElementById('view-mode').value = savedView;
+    };
   </script>
 </body>
 </html>
