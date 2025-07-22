@@ -1,142 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salary Stopwatch App</title>
+  <title>Enhanced Salary Stopwatch</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background-color: #f3f3f3;
-      margin: 0;
+    * {
+      box-sizing: border-box;
     }
 
-    .config {
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
-      flex-direction: column;
-      gap: 15px;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      min-width: 300px;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 90%;
+      transition: all 0.3s ease;
+    }
+
+    .container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      font-weight: 300;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .input-group {
+      margin-bottom: 25px;
     }
 
     label {
-      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    input,
-    select,
-    button {
-      padding: 10px;
+    input, select {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      transition: all 0.3s ease;
+      background: white;
     }
 
-    #output {
-      font-size: 3em;
-      font-weight: bold;
-      margin: 20px;
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #495057;
+      border: 2px solid #e9ecef;
+      margin-top: 20px;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+      transform: translateY(-1px);
+    }
+
+    .stopwatch-display {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .earnings {
+      font-size: 4em;
+      font-weight: 700;
+      margin: 20px 0;
+      transition: all 0.3s ease;
+    }
+
+    .earnings.pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .simple {
+      color: #28a745;
+      text-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+    }
+
+    .digital {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 15px;
+      border: 3px solid #333;
+      box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
+      letter-spacing: 3px;
+    }
+
+    .flip {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(145deg, #2c3e50, #34495e);
+      color: #ecf0f1;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 
+        inset 5px 5px 10px rgba(0, 0, 0, 0.3),
+        inset -5px -5px 10px rgba(255, 255, 255, 0.1);
+      letter-spacing: 2px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin: 25px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 15px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.8em;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .hidden {
       display: none;
     }
 
-    .flip-clock {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 3em;
-      letter-spacing: 0.1em;
-      background: black;
-      color: limegreen;
-      padding: 10px;
-      border-radius: 10px;
+    .time-display {
+      font-size: 1.2em;
+      color: #666;
+      margin-bottom: 10px;
     }
 
-    .digital-clock {
-      font-family: 'Digital-7', sans-serif;
-      font-size: 3em;
-      background: black;
-      color: red;
-      padding: 10px;
-      border-radius: 10px;
+    .currency-symbol {
+      font-size: 0.8em;
+      vertical-align: top;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+        margin: 20px;
+      }
+
+      .earnings {
+        font-size: 3em;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
     }
   </style>
 </head>
-
 <body>
-  <div class="config" id="config">
-    <h1>Salary Stopwatch App</h1>
-
-    <label for="salary">Annual Salary (£):</label>
-    <input type="number" id="salary" placeholder="Enter annual salary">
-
-    <label for="hours">Hours per week:</label>
-    <input type="number" id="hours" placeholder="Enter hours per week">
-
-    <label for="viewMode">View Mode:</label>
-    <select id="viewMode">
-      <option value="simple">Simple</option>
-      <option value="digital">Digital</option>
-      <option value="flip">Flip Clock</option>
-    </select>
-
-    <button onclick="startStopwatch()">Start</button>
-  </div>
-
-  <div id="stopwatch" class="hidden">
-    <div id="output" class="simple">£0.00</div>
-    <button onclick="resetStopwatch()">Reset</button>
+  <div class="container">
+    <div id="config">
+      <h1>💰 Salary Stopwatch</h1>
+      <div class="input-group">
+        <label for="salary">Annual Salary</label>
+        <input type="number" id="salary" placeholder="50000" min="1" step="1000">
+      </div>
+      <div class="input-group">
+        <label for="hours">Hours per Week</label>
+        <input type="number" id="hours" placeholder="40" min="1" max="168" step="0.5">
+      </div>
+      <div class="input-group">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="£">British Pound (£)</option>
+          <option value="$">US Dollar ($)</option>
+          <option value="€">Euro (€)</option>
+          <option value="¥">Japanese Yen (¥)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="viewMode">Display Style</label>
+        <select id="viewMode">
+          <option value="simple">Modern</option>
+          <option value="digital">Digital Terminal</option>
+          <option value="flip">Retro Flip</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="startStopwatch()">Start Earning! 🚀</button>
+    </div>
+    
+    <div id="stopwatch" class="hidden">
+      <div class="stopwatch-display">
+        <div class="time-display" id="timeDisplay">00:00:00</div>
+        <div id="earnings" class="earnings simple">£0.00</div>
+      </div>
+      
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="perSecond">£0.00</div>
+          <div class="stat-label">Per Second</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="perMinute">£0.00</div>
+          <div class="stat-label">Per Minute</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="perHour">£0.00</div>
+          <div class="stat-label">Per Hour</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="perDay">£0.00</div>
+          <div class="stat-label">Per Day</div>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 15px;">
+        <button class="btn btn-secondary" onclick="pauseResume()" id="pauseBtn">⏸️ Pause</button>
+        <button class="btn btn-secondary" onclick="resetStopwatch()">🔄 Reset</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    let interval;
+    let animationFrame;
     let startTime;
+    let pausedTime = 0;
+    let isPaused = false;
     let salaryPerSecond = 0;
+    let currency = '£';
 
-    function startStopwatch() {
-      const salary = parseFloat(document.getElementById('salary').value);
-      const hours = parseFloat(document.getElementById('hours').value);
-      const viewMode = document.getElementById('viewMode').value;
-
-      if (isNaN(salary) || isNaN(hours)) {
-        alert('Please enter valid numbers for salary and hours.');
-        return;
-      }
-
-      salaryPerSecond = salary / (52 * hours * 3600);
-
-      document.getElementById('config').classList.add('hidden');
-      document.getElementById('stopwatch').classList.remove('hidden');
-
-      const output = document.getElementById('output');
-      output.className = viewMode === 'flip' ? 'flip-clock' : viewMode === 'digital' ? 'digital-clock' : 'simple';
-
-      startTime = performance.now();
-      interval = requestAnimationFrame(updateTimer);
+    function formatNumber(num) {
+      return num.toLocaleString('en-GB', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
     }
 
-    function updateTimer(timestamp) {
-      const elapsedSeconds = (timestamp - startTime) / 1000;
-      const earnings = elapsedSeconds * salaryPerSecond;
-      document.getElementById('output').textContent = `£${earnings.toFixed(2)}`;
-      interval = requestAnimationFrame(updateTimer);
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function validateInputs() {
+      const salary = parseFloat(document.getElementById('salary').value);
+      const hours = parseFloat(document.getElementById('hours').value);
+      
+      if (isNaN(salary) || salary <= 0) {
+        alert('Please enter a valid annual salary (greater than 0).');
+        return null;
+      }
+      
+      if (isNaN(hours) || hours <= 0 || hours > 168) {
+        alert('Please enter valid hours per week (1-168).');
+        return null;
+      }
+      
+      return { salary, hours };
+    }
+
+    function startStopwatch() {
+      const inputs = validateInputs();
+      if (!inputs) return;
+
+      const { salary, hours } = inputs;
+      const viewMode = document.getElementById('viewMode').value;
+      currency = document.getElementById('currency').value;
+
+      // Calculate rates
+      salaryPerSecond = salary / (52 * hours * 3600);
+      const salaryPerMinute = salaryPerSecond * 60;
+      const salaryPerHour = salary / (52 * hours);
+      const salaryPerDay = salaryPerHour * hours / 5; // Assuming 5 working days per week
+
+      // Update UI
+      document.getElementById('config').classList.add('hidden');
+      document.getElementById('stopwatch').classList.remove('hidden');
+      
+      const earningsEl = document.getElementById('earnings');
+      earningsEl.className = `earnings ${viewMode}`;
+      if (viewMode === 'simple') {
+        earningsEl.classList.add('pulse');
+      }
+
+      // Update stats
+      document.getElementById('perSecond').textContent = `${currency}${formatNumber(salaryPerSecond)}`;
+      document.getElementById('perMinute').textContent = `${currency}${formatNumber(salaryPerMinute)}`;
+      document.getElementById('perHour').textContent = `${currency}${formatNumber(salaryPerHour)}`;
+      document.getElementById('perDay').textContent = `${currency}${formatNumber(salaryPerDay)}`;
+
+      startTime = performance.now();
+      pausedTime = 0;
+      isPaused = false;
+      document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+      
+      updateTimer();
+    }
+
+    function updateTimer() {
+      if (!isPaused) {
+        const currentTime = performance.now();
+        const elapsedSeconds = (currentTime - startTime - pausedTime) / 1000;
+        const earnings = elapsedSeconds * salaryPerSecond;
+        
+        document.getElementById('earnings').textContent = `${currency}${formatNumber(earnings)}`;
+        document.getElementById('timeDisplay').textContent = formatTime(elapsedSeconds);
+      }
+      
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function pauseResume() {
+      if (isPaused) {
+        // Resume
+        const currentTime = performance.now();
+        const pauseDuration = currentTime - pauseStartTime;
+        pausedTime += pauseDuration;
+        isPaused = false;
+        document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+      } else {
+        // Pause
+        pauseStartTime = performance.now();
+        isPaused = true;
+        document.getElementById('pauseBtn').textContent = '▶️ Resume';
+      }
     }
 
     function resetStopwatch() {
-      cancelAnimationFrame(interval);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
       document.getElementById('stopwatch').classList.add('hidden');
       document.getElementById('config').classList.remove('hidden');
+      pausedTime = 0;
+      isPaused = false;
     }
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.code === 'Space' && !document.getElementById('stopwatch').classList.contains('hidden')) {
+        e.preventDefault();
+        pauseResume();
+      } else if (e.code === 'Escape') {
+        resetStopwatch();
+      }
+    });
+
+    // Add some default values for better UX
+    document.getElementById('salary').value = '50000';
+    document.getElementById('hours').value = '40';
   </script>
 </body>
-
 </html>
