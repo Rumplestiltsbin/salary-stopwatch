@@ -6,18 +6,35 @@
   <title>Salary Stopwatch</title>
   <style>
     * { box-sizing: border-box; }
+    :root {
+      --bg-light: #f3f3f3;
+      --bg-dark: #121212;
+      --fg-light: #333;
+      --fg-dark: #f3f3f3;
+      --card-light: rgba(255,255,255,0.95);
+      --card-dark: rgba(30,30,30,0.85);
+    }
     body {
       margin:0; min-height:100vh;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg,#667eea,#764ba2);
+      background: var(--bg-light);
+      color: var(--fg-light);
       display:flex; align-items:center; justify-content:center;
-      color:#333;
+      transition: background .3s, color .3s;
+    }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--fg-dark);
     }
     .container {
-      background: rgba(255,255,255,0.95);
+      background: var(--card-light);
       backdrop-filter: blur(10px);
       border-radius:20px; padding:30px;
       max-width:500px; width:90%;
+      transition: background .3s;
+    }
+    body.dark .container {
+      background: var(--card-dark);
     }
     h1 {
       text-align:center; margin-bottom:20px;
@@ -30,17 +47,29 @@
     .input-group { margin-bottom:15px; }
     label {
       display:block; margin-bottom:5px;
-      font-weight:600; font-size:.9em; color:#555;
+      font-weight:600; font-size:.9em;
       text-transform:uppercase; letter-spacing:.5px;
     }
     input, select {
       width:100%; padding:10px;
       border:2px solid #e1e5e9; border-radius:8px;
       font-size:1em; transition:all .2s;
+      background: white; color: inherit;
+    }
+    body.dark input, body.dark select {
+      background: #333; border-color: #444;
+      color: #f3f3f3;
     }
     input:focus, select:focus {
       outline:none; border-color:#667eea;
       box-shadow:0 0 0 3px rgba(102,126,234,0.2);
+    }
+    .toggle-wrapper {
+      display: flex; align-items: center;
+      gap: 10px; margin-bottom: 20px;
+    }
+    .toggle-wrapper input {
+      width: auto; margin: 0;
     }
     .btn {
       width:100%; padding:12px;
@@ -49,9 +78,11 @@
       text-transform:uppercase; cursor:pointer;
       background:linear-gradient(135deg,#667eea,#764ba2);
       color:#fff; margin-top:10px;
+      transition: transform .2s;
     }
+    .btn:hover { transform: translateY(-2px); }
     .stopwatch-display { text-align:center; margin:25px 0; }
-    .time-display { font-size:1.2em; color:#666; }
+    .time-display { font-size:1.2em; color:inherit; }
     .earnings {
       font-size:2.8em; font-weight:700;
       color:#28a745; text-shadow:0 2px 4px rgba(40,167,69,0.2);
@@ -60,13 +91,18 @@
       display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
       gap:10px; margin:20px 0; padding:10px;
       background:rgba(255,255,255,0.5); border-radius:8px;
+      transition: background .3s;
     }
+    body.dark .stats { background:rgba(50,50,50,0.5); }
     .stat-item {
       text-align:center; padding:8px; background:#fff;
       border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05);
+      transition: background .3s;
     }
+    body.dark .stat-item { background:#2a2a2a; }
     .stat-value { font-size:1.2em; font-weight:700; color:#667eea; }
     .stat-label { font-size:.75em; color:#666; text-transform:uppercase; }
+    body.dark .stat-label { color:#aaa; }
     .hidden { display:none; }
   </style>
 </head>
@@ -75,7 +111,13 @@
   <div class="container" id="config">
     <h1>Salary Stopwatch</h1>
 
-    <!-- Setup Mode + Display Style -->
+    <!-- Theme Toggle -->
+    <div class="toggle-wrapper">
+      <input type="checkbox" id="themeToggle">
+      <label for="themeToggle">Dark Mode</label>
+    </div>
+
+    <!-- Setup Mode + Currency -->
     <div class="row">
       <div class="input-group">
         <label for="mode">Setup Mode</label>
@@ -85,11 +127,12 @@
         </select>
       </div>
       <div class="input-group">
-        <label for="viewMode">Display Style</label>
-        <select id="viewMode">
-          <option value="simple">Modern</option>
-          <option value="digital">Digital</option>
-          <option value="flip">Flip</option>
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="£">£</option>
+          <option value="$">$</option>
+          <option value="€">€</option>
+          <option value="¥">¥</option>
         </select>
       </div>
     </div>
@@ -99,27 +142,17 @@
       <div class="row">
         <div class="input-group">
           <label for="hourlyRate">Hourly Rate</label>
-          <input type="number" id="hourlyRate" placeholder="e.g. 15.00" min="0" step="0.01" />
-        </div>
-        <div class="input-group">
-          <label for="currencyH">Currency</label>
-          <select id="currencyH">
-            <option value="£">£</option>
-            <option value="$">$</option>
-            <option value="€">€</option>
-            <option value="¥">¥</option>
-          </select>
+          <input type="number" id="hourlyRate" placeholder="15.00" min="0" step="0.01">
         </div>
       </div>
-      <!-- Start/End times (full width) -->
       <div class="row">
         <div class="input-group">
           <label for="startTimeH">Start Time</label>
-          <input type="time" id="startTimeH" value="09:00" />
+          <input type="time" id="startTimeH" value="09:00">
         </div>
         <div class="input-group">
           <label for="endTimeH">End Time</label>
-          <input type="time" id="endTimeH" value="17:00" />
+          <input type="time" id="endTimeH" value="17:00">
         </div>
       </div>
     </div>
@@ -129,26 +162,17 @@
       <div class="row">
         <div class="input-group">
           <label for="salaryAnnual">Annual Salary</label>
-          <input type="number" id="salaryAnnual" placeholder="e.g. 50000" min="0" step="100" />
-        </div>
-        <div class="input-group">
-          <label for="currencyS">Currency</label>
-          <select id="currencyS">
-            <option value="£">£</option>
-            <option value="$">$</option>
-            <option value="€">€</option>
-            <option value="¥">¥</option>
-          </select>
+          <input type="number" id="salaryAnnual" placeholder="50000" min="0" step="100">
         </div>
       </div>
       <div class="row">
         <div class="input-group">
-          <label for="startTime">Today's Start</label>
-          <input type="time" id="startTime" value="09:00" />
+          <label for="startTime">Start Time</label>
+          <input type="time" id="startTime" value="09:00">
         </div>
         <div class="input-group">
-          <label for="endTime">Today's End</label>
-          <input type="time" id="endTime" value="17:00" />
+          <label for="endTime">End Time</label>
+          <input type="time" id="endTime" value="17:00">
         </div>
       </div>
     </div>
@@ -174,22 +198,23 @@
   </div>
 
   <script>
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark', themeToggle.checked);
+    });
+
     // Mode toggle
     const modeEl = document.getElementById('mode'),
           hourlyFields = document.getElementById('hourlyFields'),
           salaryFields = document.getElementById('salaryFields');
-
-    modeEl.addEventListener('change', ()=>{
-      if(modeEl.value==='salary'){
-        hourlyFields.classList.add('hidden');
-        salaryFields.classList.remove('hidden');
-      } else {
-        salaryFields.classList.add('hidden');
-        hourlyFields.classList.remove('hidden');
-      }
+    modeEl.addEventListener('change', () => {
+      const isSalary = modeEl.value === 'salary';
+      hourlyFields.classList.toggle('hidden', isSalary);
+      salaryFields.classList.toggle('hidden', !isSalary);
     });
 
-    // Stopwatch vars
+    // Stopwatch logic (unchanged)...
     let frame, startTS, paused=false, pauseStart, pausedDur=0;
     let ratePerSec=0, initOffset=0;
 
@@ -198,31 +223,28 @@
     }
 
     function startStopwatch(){
-      const view = document.getElementById('viewMode').value;
-      let currency, start, end, now=new Date(), workedSec=0, dayHours=8;
+      const view = ''; // view unused now
+      let currency = document.getElementById('currency').value;
+      let now = new Date(), workedSec=0, dayHours=8;
 
       if(modeEl.value==='hourly'){
         const hr = parseFloat(document.getElementById('hourlyRate').value);
-        currency = document.getElementById('currencyH').value;
         if(isNaN(hr)||hr<0) return alert('Enter valid hourly rate');
         ratePerSec = hr/3600;
-        // compute offset from startTimeH
-        start = document.getElementById('startTimeH').value.split(':');
-        end   = document.getElementById('endTimeH').value.split(':');
-        const sd = new Date(now); sd.setHours(...start);
-        const ed = new Date(now); ed.setHours(...end);
+        const [sh,sm] = document.getElementById('startTimeH').value.split(':').map(Number);
+        const [eh,em] = document.getElementById('endTimeH').value.split(':').map(Number);
+        const sd = new Date(now); sd.setHours(sh,sm);
+        const ed = new Date(now); ed.setHours(eh,em);
         workedSec = Math.max(0, Math.min((now-sd)/1000,(ed-sd)/1000));
         dayHours = (ed-sd)/3600000;
         initOffset = workedSec*ratePerSec;
       } else {
         const sal = parseFloat(document.getElementById('salaryAnnual').value);
-        currency = document.getElementById('currencyS').value;
         if(isNaN(sal)||sal<0) return alert('Enter valid salary');
-        const st = document.getElementById('startTime').value.split(':');
-        const et = document.getElementById('endTime').value.split(':');
-        const sd = new Date(now); sd.setHours(...st);
-        const ed = new Date(now); ed.setHours(...et);
-        if(ed<=sd) return alert('End must be after start');
+        const [sh,sm] = document.getElementById('startTime').value.split(':').map(Number);
+        const [eh,em] = document.getElementById('endTime').value.split(':').map(Number);
+        const sd = new Date(now); sd.setHours(sh,sm);
+        const ed = new Date(now); ed.setHours(eh,em);
         workedSec = (now>sd)?Math.min((now-sd)/1000,(ed-sd)/1000):0;
         dayHours = (ed-sd)/3600000;
         ratePerSec = sal/(52*dayHours*3600*5);
@@ -235,11 +257,10 @@
       document.getElementById('perHour').innerText = currency+formatNum(ratePerSec*3600);
       document.getElementById('perDay').innerText = currency+formatNum(ratePerSec*3600*dayHours);
 
-      // show
       document.getElementById('config').classList.add('hidden');
       const sw = document.getElementById('stopwatch');
       sw.classList.remove('hidden');
-      document.getElementById('earnings').className='earnings '+view;
+      document.getElementById('earnings').className='earnings';
 
       startTS = performance.now(); pausedDur=0; paused=false;
       document.getElementById('pauseBtn').innerText='⏸️ Pause';
