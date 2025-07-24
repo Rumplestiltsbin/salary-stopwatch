@@ -15,11 +15,14 @@
       --card-dark: rgba(30,30,30,0.85);
     }
     body {
-      margin:0; min-height:100vh;
-      font-family:'Segoe UI',sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
       background: var(--bg-light);
       color: var(--fg-light);
-      display:flex; align-items:center; justify-content:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: background .3s, color .3s;
     }
     body.dark {
@@ -29,74 +32,131 @@
     .container {
       background: var(--card-light);
       backdrop-filter: blur(10px);
-      border-radius:20px; padding:30px;
-      max-width:500px; width:90%;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
       transition: background .3s;
     }
     body.dark .container {
       background: var(--card-dark);
     }
     h1 {
-      text-align:center; margin-bottom:20px;
-      font-size:1.8em; font-weight:400;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      font-weight: 400;
     }
     .row {
-      display:flex; gap:10px; margin-bottom:15px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
     }
-    .row .input-group { flex:1; }
-    .input-group { margin-bottom:15px; }
+    .row .input-group {
+      flex: 1;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
     label {
-      display:block; margin-bottom:5px;
-      font-weight:600; font-size:.9em;
-      text-transform:uppercase; letter-spacing:.5px;
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: .9em;
+      text-transform: uppercase;
+      letter-spacing: .5px;
     }
     input, select {
-      width:100%; padding:10px;
-      border:2px solid #e1e5e9; border-radius:8px;
-      font-size:1em; transition:all .2s;
-      background:white; color:inherit;
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all .2s;
+      background: white;
+      color: inherit;
     }
     body.dark input, body.dark select {
-      background:#333; border-color:#444;
-      color:#f3f3f3;
+      background: #333;
+      border-color: #444;
+      color: #f3f3f3;
     }
     input:focus, select:focus {
-      outline:none; border-color:#667eea;
-      box-shadow:0 0 0 3px rgba(102,126,234,0.2);
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
     }
     .btn {
-      width:100%; padding:12px;
-      font-size:1em; font-weight:600;
-      border:none; border-radius:8px;
-      text-transform:uppercase; cursor:pointer;
-      background:linear-gradient(135deg,#667eea,#764ba2);
-      color:#fff; margin-top:10px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: #fff;
+      margin-top: 10px;
       transition: transform .2s;
     }
-    .btn:hover { transform: translateY(-2px); }
-    .stopwatch-display { text-align:center; margin:25px 0; }
-    .time-display { font-size:1.2em; color:inherit; }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .stopwatch-display {
+      text-align: center;
+      margin: 25px 0;
+    }
+    .time-display {
+      font-size: 1.2em;
+      color: inherit;
+    }
     .earnings {
-      font-size:2.8em; font-weight:700;
-      color:#28a745; text-shadow:0 2px 4px rgba(40,167,69,0.2);
+      font-size: 2.8em;
+      font-weight: 700;
+      color: #28a745;
+      text-shadow: 0 2px 4px rgba(40,167,69,0.2);
     }
     .stats {
-      display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-      gap:10px; margin:20px 0; padding:10px;
-      background:rgba(255,255,255,0.5); border-radius:8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(100px,1fr));
+      gap: 10px;
+      margin: 20px 0;
+      padding: 10px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 8px;
       transition: background .3s;
     }
-    body.dark .stats { background:rgba(50,50,50,0.5); }
+    body.dark .stats {
+      background: rgba(50,50,50,0.5);
+    }
     .stat-item {
-      text-align:center; padding:8px; background:#fff;
-      border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05);
+      text-align: center;
+      padding: 8px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       transition: background .3s;
     }
-    body.dark .stat-item { background:#2a2a2a; }
-    .stat-value { font-size:1.2em; font-weight:700; color:#667eea; }
-    .stat-label { font-size:.75em; color:#666; text-transform:uppercase; }
-    body.dark .stat-label { color:#aaa; }
-    .hidden { display:none; }
+    body.dark .stat-item {
+      background: #2a2a2a;
+    }
+    .stat-value {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .stat-label {
+      font-size: .75em;
+      color: #666;
+      text-transform: uppercase;
+    }
+    body.dark .stat-label {
+      color: #aaa;
+    }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -104,7 +164,7 @@
   <div class="container" id="config">
     <h1>Salary Stopwatch</h1>
 
-    <!-- Mode + Theme -->
+    <!-- Setup Mode + Theme Selector -->
     <div class="row">
       <div class="input-group">
         <label for="mode">Setup Mode</label>
@@ -127,7 +187,7 @@
       <div class="row">
         <div class="input-group">
           <label for="hourlyRate">Hourly Rate</label>
-          <input type="number" id="hourlyRate" placeholder="15.00" min="0" step="0.01">
+          <input type="number" id="hourlyRate" placeholder="15.00" min="0" step="0.01" />
         </div>
         <div class="input-group">
           <label for="currencyH">Currency</label>
@@ -142,29 +202,27 @@
       <div class="row">
         <div class="input-group">
           <label for="startTimeH">Start Time</label>
-          <input type="time" id="startTimeH" value="09:00">
+          <input type="time" id="startTimeH" value="09:00" />
         </div>
         <div class="input-group">
           <label for="endTimeH">End Time</label>
-          <input type="time" id="endTimeH" value="17:00">
+          <input type="time" id="endTimeH" value="17:00" />
         </div>
       </div>
     </div>
 
     <!-- Salary Mode Fields -->
     <div id="salaryFields" class="hidden">
-      <!-- Annual Salary + Hours/Week -->
       <div class="row">
         <div class="input-group">
           <label for="salaryAnnual">Annual Salary</label>
-          <input type="number" id="salaryAnnual" placeholder="50000" min="0" step="100">
+          <input type="number" id="salaryAnnual" placeholder="50000" min="0" step="100" />
         </div>
         <div class="input-group">
           <label for="hoursWeekly">Hours per Week</label>
-          <input type="number" id="hoursWeekly" placeholder="40" min="1" max="168" step="0.5">
+          <input type="number" id="hoursWeekly" placeholder="40" min="1" max="168" step="0.5" />
         </div>
       </div>
-      <!-- Currency + (empty placeholder to align) -->
       <div class="row">
         <div class="input-group">
           <label for="currencyS">Currency</label>
@@ -177,15 +235,14 @@
         </div>
         <div class="input-group"></div>
       </div>
-      <!-- Start & End side by side -->
       <div class="row">
         <div class="input-group">
           <label for="startTime">Start Time</label>
-          <input type="time" id="startTime" value="09:00">
+          <input type="time" id="startTime" value="09:00" />
         </div>
         <div class="input-group">
           <label for="endTime">End Time</label>
-          <input type="time" id="endTime" value="17:00">
+          <input type="time" id="endTime" value="17:00" />
         </div>
       </div>
     </div>
@@ -252,7 +309,7 @@
 
     function startStopwatch() {
       const now = new Date(), mode = modeEl.value;
-      let currency, workedSec = 0, weekHours = 40, dayHours = 8;
+      let currency, workedSec = 0, weekHours, dayHours;
 
       if (mode === 'hourly') {
         const hr = parseFloat(document.getElementById('hourlyRate').value);
@@ -278,18 +335,17 @@
         const ed = new Date(now); ed.setHours(eh, em);
         workedSec = (now > sd) ? Math.min((now - sd) / 1000, (ed - sd) / 1000) : 0;
         dayHours = (ed - sd) / 3600000;
-        // salary per second = annual / (52 weeks * hours/week * 3600)
         ratePerSec = sal / (52 * weekHours * 3600);
         initOffset = workedSec * ratePerSec;
       }
 
-      // populate stats
+      // Populate stats
       document.getElementById('perSecond').innerText = currency + formatNum(ratePerSec);
       document.getElementById('perMinute').innerText = currency + formatNum(ratePerSec * 60);
       document.getElementById('perHour').innerText = currency + formatNum(ratePerSec * 3600);
       document.getElementById('perDay').innerText = currency + formatNum(ratePerSec * 3600 * dayHours);
 
-      // show stopwatch UI
+      // Show stopwatch
       document.getElementById('config').classList.add('hidden');
       document.getElementById('stopwatch').classList.remove('hidden');
       document.getElementById('earnings').className = 'earnings';
