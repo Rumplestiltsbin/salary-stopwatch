@@ -5,7 +5,108 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Salary Stopwatch</title>
   <style>
-    /* — your existing styles up through .stats… unchanged — */
+    * { box-sizing: border-box; }
+    :root {
+      --bg-light: linear-gradient(135deg,#667eea,#764ba2);
+      --bg-dark: #121212;
+      --fg-light: #333;
+      --fg-dark: #f3f3f3;
+      --card-light: rgba(255,255,255,0.95);
+      --card-dark: rgba(30,30,30,0.85);
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--fg-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .3s, color .3s;
+    }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--fg-dark);
+    }
+    .container {
+      background: var(--card-light);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      transition: background .3s;
+    }
+    body.dark .container {
+      background: var(--card-dark);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      font-weight: 400;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .input-group {
+      flex: 1;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: .9em;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all .2s;
+      background: white;
+      color: inherit;
+    }
+    body.dark input, body.dark select {
+      background: #333;
+      border-color: #444;
+      color: #f3f3f3;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: #fff;
+      margin-top: 10px;
+      transition: transform .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+
+    .stopwatch-display { text-align: center; margin: 25px 0; }
+    .time-display { font-size: 1.2em; color: inherit; }
+    .earnings {
+      font-size: 2.8em;
+      font-weight: 700;
+      color: #28a745;
+      text-shadow: 0 2px 4px rgba(40,167,69,0.2);
+    }
 
     /* 2×2 layout for stats */
     .stats {
@@ -18,19 +119,134 @@
       border-radius: 8px;
       transition: background .3s;
     }
-    /* rest of your CSS unchanged */
+    body.dark .stats { background: rgba(50,50,50,0.5); }
+    .stat-item {
+      text-align: center;
+      padding: 8px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: background .3s;
+    }
+    body.dark .stat-item { background: #2a2a2a; }
+    .stat-value {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .stat-label {
+      font-size: .75em;
+      color: #666;
+      text-transform: uppercase;
+    }
+    body.dark .stat-label { color: #aaa; }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- … your config screen unchanged … -->
+  <!-- CONFIG SCREEN -->
+  <div class="container" id="config">
+    <h1>Salary Stopwatch</h1>
 
+    <!-- Mode & Theme -->
+    <div class="row">
+      <div class="input-group">
+        <label for="mode">Setup Mode</label>
+        <select id="mode">
+          <option value="hourly">Hourly Mode</option>
+          <option value="salary" selected>Salary Mode</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="viewMode">View Mode</label>
+        <select id="viewMode">
+          <option value="light" selected>Light Mode</option>
+          <option value="dark">Dark Mode</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- SALARY MODE FIELDS -->
+    <div id="salaryFields">
+      <!-- Row 1: Annual Salary + Currency -->
+      <div class="row">
+        <div class="input-group">
+          <label for="salaryAnnual">Annual Salary</label>
+          <input type="number" id="salaryAnnual" placeholder="50000" min="0" step="100"/>
+        </div>
+        <div class="input-group">
+          <label for="currencyS">Currency</label>
+          <select id="currencyS">
+            <option value="£">£</option>
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="¥">¥</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Hours per Week + placeholder for alignment -->
+      <div class="row">
+        <div class="input-group">
+          <label for="hoursWeekly">Hours per Week</label>
+          <input type="number" id="hoursWeekly" placeholder="40" min="1" max="168" step="0.5"/>
+        </div>
+        <div class="input-group"></div>
+      </div>
+
+      <!-- Row 3: Start/End side by side -->
+      <div class="row">
+        <div class="input-group">
+          <label for="startTime">Start Time</label>
+          <input type="time" id="startTime" value="09:00"/>
+        </div>
+        <div class="input-group">
+          <label for="endTime">End Time</label>
+          <input type="time" id="endTime" value="17:00"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOURLY MODE FIELDS -->
+    <div id="hourlyFields" class="hidden">
+      <div class="row">
+        <div class="input-group">
+          <label for="hourlyRate">Hourly Rate</label>
+          <input type="number" id="hourlyRate" placeholder="15.00" min="0" step="0.01"/>
+        </div>
+        <div class="input-group">
+          <label for="currencyH">Currency</label>
+          <select id="currencyH">
+            <option value="£">£</option>
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="¥">¥</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          <label for="startTimeH">Start Time</label>
+          <input type="time" id="startTimeH" value="09:00"/>
+        </div>
+        <div class="input-group">
+          <label for="endTimeH">End Time</label>
+          <input type="time" id="endTimeH" value="17:00"/>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="startStopwatch()">Start Earning!</button>
+  </div>
+
+  <!-- STOPWATCH SCREEN -->
   <div class="container hidden" id="stopwatch">
     <div class="stopwatch-display">
       <div class="time-display" id="timeDisplay">00:00:00</div>
       <div id="earnings" class="earnings">£0.00</div>
     </div>
-
     <div class="stats">
       <div class="stat-item">
         <div class="stat-value" id="perSecond">£0.00</div>
@@ -49,7 +265,6 @@
         <div class="stat-label">Per Day</div>
       </div>
     </div>
-
     <div style="display:flex;justify-content:center;gap:10px">
       <button class="btn btn-secondary" onclick="pauseResume()" id="pauseBtn">⏸️ Pause</button>
       <button class="btn btn-secondary" onclick="resetStopwatch()">🔄 Reset</button>
@@ -57,42 +272,78 @@
   </div>
 
   <script>
-    let frame, baseOffsetEarnings = 0, baseOffsetSeconds = 0;
-    let ratePerSec = 0, startTimestamp;
-    let paused = false, pauseStart, pausedAccum = 0;
+    // Elements
+    const modeEl = document.getElementById('mode'),
+          viewEl = document.getElementById('viewMode'),
+          salaryFields = document.getElementById('salaryFields'),
+          hourlyFields = document.getElementById('hourlyFields'),
+          currencySymbolElS = document.getElementById('currencyS'),
+          currencySymbolElH = document.getElementById('currencyH');
+
+    // Toggle fieldsets
+    modeEl.addEventListener('change', () => {
+      salaryFields.classList.toggle('hidden', modeEl.value!=='salary');
+      hourlyFields.classList.toggle('hidden', modeEl.value==='salary');
+    });
+    // Toggle theme
+    viewEl.addEventListener('change', () => {
+      document.body.classList.toggle('dark', viewEl.value==='dark');
+    });
+
+    // Stopwatch variables
+    let frame, startTS, paused=false, pauseStart, pausedAccum=0;
+    let ratePerSec=0, baseOffsetSec=0, baseOffsetEarn=0;
+    let currencySymbol = '£';
 
     function startStopwatch() {
-      const mode = document.getElementById('mode').value;
       const now = new Date();
-      let startInput, startDate, endInput, totalWorkSeconds;
+      let startInput, workSec=0, dayHours=1;
 
-      if (mode === 'salary') {
-        // … your salary-mode setup (ratePerSec calculation) …
+      if (modeEl.value==='salary') {
+        // Salary mode
+        const sal = parseFloat(document.getElementById('salaryAnnual').value);
+        const weekH = parseFloat(document.getElementById('hoursWeekly').value);
+        currencySymbol = currencySymbolElS.value;
+        if (isNaN(sal)||sal<=0) return alert('Enter valid annual salary');
+        if (isNaN(weekH)||weekH<=0) return alert('Enter valid hours/week');
+        ratePerSec = sal/(52*weekH*3600);
 
-        // figure out today’s start time:
-        startInput = document.getElementById('startTime').value;    // e.g. "09:00"
+        startInput = document.getElementById('startTime').value;
+        const [sh,sm] = startInput.split(':').map(Number);
+        const sd = new Date(now.getFullYear(),now.getMonth(),now.getDate(),sh,sm);
+        workSec = Math.max(0, Math.min((now-sd)/1000, (document.getElementById('endTime').value ?
+          ((new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTime').value.split(':').map(Number)) - sd)/1000) : Infinity));
+        dayHours = (new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTime').value.split(':').map(Number)) - sd)/3600000;
       } else {
-        // … hourly-mode setup …
+        // Hourly mode
+        const hr = parseFloat(document.getElementById('hourlyRate').value);
+        currencySymbol = currencySymbolElH.value;
+        if (isNaN(hr)||hr<=0) return alert('Enter valid hourly rate');
+        ratePerSec = hr/3600;
+
         startInput = document.getElementById('startTimeH').value;
+        const [sh,sm] = startInput.split(':').map(Number);
+        const sd = new Date(now.getFullYear(),now.getMonth(),now.getDate(),sh,sm);
+        workSec = Math.max(0, Math.min((now-sd)/1000, (document.getElementById('endTimeH').value ?
+          ((new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTimeH').value.split(':').map(Number)) - sd)/1000) : Infinity));
+        dayHours = (new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTimeH').value.split(':').map(Number)) - sd)/3600000;
       }
 
-      // build a Date() for today at the “startInput” hour/minute
-      const [sh, sm] = startInput.split(':').map(x => parseInt(x,10));
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), sh, sm);
-      totalWorkSeconds = Math.max(0, (now - startDate)/1000);
+      baseOffsetSec = workSec;
+      baseOffsetEarn = workSec * ratePerSec;
 
-      // initial offsets:
-      baseOffsetSeconds = totalWorkSeconds;
-      baseOffsetEarnings = totalWorkSeconds * ratePerSec;
+      // Populate stats
+      document.getElementById('perSecond').innerText = currencySymbol + ratePerSec.toFixed(2);
+      document.getElementById('perMinute').innerText = currencySymbol + (ratePerSec*60).toFixed(2);
+      document.getElementById('perHour').innerText   = currencySymbol + (ratePerSec*3600).toFixed(2);
+      document.getElementById('perDay').innerText    = currencySymbol + (ratePerSec*3600*dayHours).toFixed(2);
 
-      // populate your per‑second/minute/hour/day stat blocks here…
-
-      // hide config, show stopwatch
+      // Show stopwatch
       document.getElementById('config').classList.add('hidden');
       document.getElementById('stopwatch').classList.remove('hidden');
 
-      // kick off the RAF loop
-      startTimestamp = performance.now();
+      // Kick off RAF
+      startTS = performance.now();
       pausedAccum = 0;
       paused = false;
       document.getElementById('pauseBtn').innerText = '⏸️ Pause';
@@ -102,26 +353,38 @@
     function updateFrame() {
       frame = requestAnimationFrame(ts => {
         if (!paused) {
-          // elapsed runtime
-          const runSeconds = (ts - startTimestamp - pausedAccum)/1000;
-          const elapsed = baseOffsetSeconds + runSeconds;
-          const totalEarn = baseOffsetEarnings + (runSeconds * ratePerSec);
+          const runSec = (ts - startTS - pausedAccum)/1000;
+          const totalSec = baseOffsetSec + runSec;
+          const totalEarn = baseOffsetEarn + runSec*ratePerSec;
 
-          // update the clock display
-          const hh = String(Math.floor(elapsed/3600)).padStart(2,'0');
-          const mm = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
-          const ss = String(Math.floor(elapsed%60)).padStart(2,'0');
+          // Time display
+          const hh = String(Math.floor(totalSec/3600)).padStart(2,'0');
+          const mm = String(Math.floor((totalSec%3600)/60)).padStart(2,'0');
+          const ss = String(Math.floor(totalSec%60)).padStart(2,'0');
           document.getElementById('timeDisplay').innerText = `${hh}:${mm}:${ss}`;
 
-          // update earnings
-          document.getElementById('earnings').innerText =
-            currencySymbol + totalEarn.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+          // Earnings
+          document.getElementById('earnings').innerText = currencySymbol + totalEarn.toFixed(2);
         }
         updateFrame();
       });
     }
 
-    // … your pauseResume() and resetStopwatch() unchanged …
+    function pauseResume() {
+      if (!paused) {
+        paused = true; pauseStart = performance.now();
+        document.getElementById('pauseBtn').innerText = '▶️ Resume';
+      } else {
+        paused = false; pausedAccum += performance.now() - pauseStart;
+        document.getElementById('pauseBtn').innerText = '⏸️ Pause';
+      }
+    }
+
+    function resetStopwatch() {
+      cancelAnimationFrame(frame);
+      document.getElementById('stopwatch').classList.add('hidden');
+      document.getElementById('config').classList.remove('hidden');
+    }
   </script>
 </body>
 </html>
