@@ -143,11 +143,11 @@
 </head>
 <body>
 
-  <!-- CONFIGURATION SCREEN -->
+  <!-- CONFIG SCREEN -->
   <div class="container" id="config">
     <h1>Salary Stopwatch</h1>
 
-    <!-- Setup Mode & Theme -->
+    <!-- Mode & Theme -->
     <div class="row">
       <div class="input-group">
         <label for="mode">Setup Mode</label>
@@ -165,20 +165,14 @@
       </div>
     </div>
 
-    <!-- SALARY MODE -->
+    <!-- SALARY MODE FIELDS -->
     <div id="salaryFields">
-      <!-- Swap: Hours per Week next to Annual Salary -->
+      <!-- Row 1: Annual Salary + Currency -->
       <div class="row">
         <div class="input-group">
           <label for="salaryAnnual">Annual Salary</label>
           <input type="number" id="salaryAnnual" placeholder="50000" min="0" step="100"/>
         </div>
-        <div class="input-group">
-          <label for="hoursWeekly">Hours per Week</label>
-          <input type="number" id="hoursWeekly" placeholder="40" min="1" max="168" step="0.5"/>
-        </div>
-      </div>
-      <div class="row">
         <div class="input-group">
           <label for="currencyS">Currency</label>
           <select id="currencyS">
@@ -188,8 +182,18 @@
             <option value="¥">¥</option>
           </select>
         </div>
+      </div>
+
+      <!-- Row 2: Hours per Week + placeholder -->
+      <div class="row">
+        <div class="input-group">
+          <label for="hoursWeekly">Hours per Week</label>
+          <input type="number" id="hoursWeekly" placeholder="40" min="1" max="168" step="0.5"/>
+        </div>
         <div class="input-group"></div>
       </div>
+
+      <!-- Row 3: Start/End -->
       <div class="row">
         <div class="input-group">
           <label for="startTime">Start Time</label>
@@ -202,7 +206,7 @@
       </div>
     </div>
 
-    <!-- HOURLY MODE (HIDDEN BY DEFAULT) -->
+    <!-- HOURLY MODE FIELDS -->
     <div id="hourlyFields" class="hidden">
       <div class="row">
         <div class="input-group">
@@ -265,30 +269,27 @@
   </div>
 
   <script>
-    // Mode & theme handlers
+    // toggle between modes & themes
     const modeEl = document.getElementById('mode'),
           viewEl = document.getElementById('viewMode'),
-          hourlyFields = document.getElementById('hourlyFields'),
-          salaryFields = document.getElementById('salaryFields');
+          salaryFields = document.getElementById('salaryFields'),
+          hourlyFields = document.getElementById('hourlyFields');
 
     modeEl.addEventListener('change', () => {
-      const sal = modeEl.value === 'salary';
-      salaryFields.classList.toggle('hidden', !sal);
-      hourlyFields.classList.toggle('hidden', sal);
+      salaryFields.classList.toggle('hidden', modeEl.value!=='salary');
+      hourlyFields.classList.toggle('hidden', modeEl.value==='salary');
     });
-
     viewEl.addEventListener('change', () => {
-      document.body.classList.toggle('dark', viewEl.value === 'dark');
+      document.body.classList.toggle('dark', viewEl.value==='dark');
     });
 
-    // Stopwatch logic
+    // stopwatch logic (unchanged)
     let frame, startTS, paused=false, pauseStart, pausedDur=0;
     let ratePerSec=0, initOffset=0;
 
     function formatNum(n) {
-      return n.toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
+      return n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     }
-
     function startStopwatch() {
       const now=new Date(), mode=modeEl.value;
       let currency, workedSec=0, dayHours=1;
@@ -321,15 +322,14 @@
         initOffset=worked*ratePerSec;
       }
 
-      // Populate stats
       document.getElementById('perSecond').innerText=currency+formatNum(ratePerSec);
       document.getElementById('perMinute').innerText=currency+formatNum(ratePerSec*60);
       document.getElementById('perHour').innerText=currency+formatNum(ratePerSec*3600);
       document.getElementById('perDay').innerText=currency+formatNum(ratePerSec*3600*dayHours);
 
-      // Show stopwatch
       document.getElementById('config').classList.add('hidden');
       document.getElementById('stopwatch').classList.remove('hidden');
+
       startTS=performance.now(); pausedDur=0; paused=false;
       document.getElementById('pauseBtn').innerText='⏸️ Pause';
       updateLoop(currency);
@@ -354,7 +354,7 @@
         document.getElementById('pauseBtn').innerText='▶️ Resume';
       } else {
         paused=false; pausedDur+=performance.now()-pauseStart;
-        document.getElementById('pauseBtn').innerText='�pause';
+        document.getElementById('pauseBtn').innerText='⏸️ Pause';
       }
     }
 
