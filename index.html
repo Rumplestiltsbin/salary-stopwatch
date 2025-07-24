@@ -6,46 +6,27 @@
   <title>Salary Stopwatch</title>
   <style>
     * { box-sizing: border-box; }
-    :root {
-      --bg-light: linear-gradient(135deg,#667eea,#764ba2);
-      --bg-dark: #121212;
-      --fg-light: #333;
-      --fg-dark: #f3f3f3;
-      --card-light: rgba(255,255,255,0.95);
-      --card-dark: rgba(30,30,30,0.85);
-    }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-light);
-      color: var(--fg-light);
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background .3s, color .3s;
-    }
-    body.dark {
-      background: var(--bg-dark);
-      color: var(--fg-dark);
     }
     .container {
-      background: var(--card-light);
+      background: rgba(255,255,255,0.95);
       backdrop-filter: blur(10px);
-      border-radius: 20px;
+      border-radius: 16px;
       padding: 30px;
-      max-width: 500px;
       width: 90%;
-      transition: background .3s;
-    }
-    body.dark .container {
-      background: var(--card-dark);
+      max-width: 480px;
     }
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      font-size: 1.8em;
-      font-weight: 400;
     }
     .row {
       display: flex;
@@ -58,25 +39,18 @@
     label {
       display: block;
       margin-bottom: 5px;
-      font-weight: 600;
-      font-size: .9em;
+      font-size: 0.85em;
       text-transform: uppercase;
-      letter-spacing: .5px;
+      color: #555;
     }
-    input, select {
+    input, select, button {
       width: 100%;
       padding: 10px;
+      font-size: 1em;
       border: 2px solid #e1e5e9;
       border-radius: 8px;
-      font-size: 1em;
-      transition: all .2s;
-      background: white;
+      background: #fff;
       color: inherit;
-    }
-    body.dark input, body.dark select {
-      background: #333;
-      border-color: #444;
-      color: #f3f3f3;
     }
     input:focus, select:focus {
       outline: none;
@@ -84,73 +58,58 @@
       box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
     }
     .btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 1em;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      text-transform: uppercase;
-      cursor: pointer;
       background: linear-gradient(135deg,#667eea,#764ba2);
       color: #fff;
-      margin-top: 10px;
-      transition: transform .2s;
+      border: none;
+      cursor: pointer;
     }
-    .btn:hover { transform: translateY(-2px); }
+    .hidden { display: none; }
 
-    .stopwatch-display { text-align: center; margin: 25px 0; }
-    .time-display { font-size: 1.2em; color: inherit; }
+    .stopwatch-display {
+      text-align: center;
+      margin: 25px 0;
+    }
+    .time-display {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
     .earnings {
-      font-size: 2.8em;
-      font-weight: 700;
+      font-size: 2.5em;
+      font-weight: bold;
       color: #28a745;
-      text-shadow: 0 2px 4px rgba(40,167,69,0.2);
     }
 
-    /* 2×2 layout for stats */
     .stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 10px;
       margin: 20px 0;
-      padding: 10px;
-      background: rgba(255,255,255,0.5);
-      border-radius: 8px;
-      transition: background .3s;
     }
-    body.dark .stats { background: rgba(50,50,50,0.5); }
     .stat-item {
-      text-align: center;
-      padding: 8px;
       background: #fff;
+      padding: 8px;
       border-radius: 6px;
+      text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      transition: background .3s;
     }
-    body.dark .stat-item { background: #2a2a2a; }
     .stat-value {
-      font-size: 1.2em;
-      font-weight: 700;
+      font-size: 1.1em;
+      font-weight: bold;
       color: #667eea;
     }
     .stat-label {
-      font-size: .75em;
-      color: #666;
+      font-size: 0.75em;
       text-transform: uppercase;
+      color: #666;
     }
-    body.dark .stat-label { color: #aaa; }
-
-    .hidden { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- CONFIG SCREEN -->
+  <!-- CONFIGURATION SCREEN -->
   <div class="container" id="config">
     <h1>Salary Stopwatch</h1>
 
-    <!-- Mode & Theme -->
     <div class="row">
       <div class="input-group">
         <label for="mode">Setup Mode</label>
@@ -162,15 +121,14 @@
       <div class="input-group">
         <label for="viewMode">View Mode</label>
         <select id="viewMode">
-          <option value="light" selected>Light Mode</option>
-          <option value="dark">Dark Mode</option>
+          <option value="light" selected>Light</option>
+          <option value="dark">Dark</option>
         </select>
       </div>
     </div>
 
-    <!-- SALARY MODE FIELDS -->
+    <!-- Salary Mode Fields -->
     <div id="salaryFields">
-      <!-- Row 1: Annual Salary + Currency -->
       <div class="row">
         <div class="input-group">
           <label for="salaryAnnual">Annual Salary</label>
@@ -186,8 +144,6 @@
           </select>
         </div>
       </div>
-
-      <!-- Row 2: Hours per Week + placeholder for alignment -->
       <div class="row">
         <div class="input-group">
           <label for="hoursWeekly">Hours per Week</label>
@@ -195,8 +151,6 @@
         </div>
         <div class="input-group"></div>
       </div>
-
-      <!-- Row 3: Start/End side by side -->
       <div class="row">
         <div class="input-group">
           <label for="startTime">Start Time</label>
@@ -209,7 +163,7 @@
       </div>
     </div>
 
-    <!-- HOURLY MODE FIELDS -->
+    <!-- Hourly Mode Fields -->
     <div id="hourlyFields" class="hidden">
       <div class="row">
         <div class="input-group">
@@ -241,12 +195,14 @@
     <button class="btn" onclick="startStopwatch()">Start Earning!</button>
   </div>
 
-  <!-- STOPWATCH SCREEN -->
+
+  <!-- STOPWATCH DISPLAY -->
   <div class="container hidden" id="stopwatch">
     <div class="stopwatch-display">
       <div class="time-display" id="timeDisplay">00:00:00</div>
       <div id="earnings" class="earnings">£0.00</div>
     </div>
+
     <div class="stats">
       <div class="stat-item">
         <div class="stat-value" id="perSecond">£0.00</div>
@@ -265,118 +221,116 @@
         <div class="stat-label">Per Day</div>
       </div>
     </div>
-    <div style="display:flex;justify-content:center;gap:10px">
-      <button class="btn btn-secondary" onclick="pauseResume()" id="pauseBtn">⏸️ Pause</button>
-      <button class="btn btn-secondary" onclick="resetStopwatch()">🔄 Reset</button>
+
+    <div class="row">
+      <button class="btn" onclick="pauseResume()" id="pauseBtn">⏸️ Pause</button>
+      <button class="btn" onclick="resetStopwatch()">🔄 Reset</button>
     </div>
   </div>
 
+
   <script>
-    // Elements
+    // Element refs
     const modeEl = document.getElementById('mode'),
           viewEl = document.getElementById('viewMode'),
-          salaryFields = document.getElementById('salaryFields'),
-          hourlyFields = document.getElementById('hourlyFields'),
-          currencySymbolElS = document.getElementById('currencyS'),
-          currencySymbolElH = document.getElementById('currencyH');
+          salFields = document.getElementById('salaryFields'),
+          hrFields  = document.getElementById('hourlyFields');
 
-    // Toggle fieldsets
+    // Toggle modes
     modeEl.addEventListener('change', () => {
-      salaryFields.classList.toggle('hidden', modeEl.value!=='salary');
-      hourlyFields.classList.toggle('hidden', modeEl.value==='salary');
+      salFields.classList.toggle('hidden', modeEl.value !== 'salary');
+      hrFields.classList.toggle('hidden', modeEl.value === 'salary');
     });
-    // Toggle theme
+
+    // Toggle light/dark
     viewEl.addEventListener('change', () => {
       document.body.classList.toggle('dark', viewEl.value==='dark');
     });
 
-    // Stopwatch variables
+    // Stopwatch vars
     let frame, startTS, paused=false, pauseStart, pausedAccum=0;
-    let ratePerSec=0, baseOffsetSec=0, baseOffsetEarn=0;
-    let currencySymbol = '£';
+    let ratePerSec=0, baseSec=0, baseEarn=0;
+    let currencySymbol='£';
 
     function startStopwatch() {
       const now = new Date();
-      let startInput, workSec=0, dayHours=1;
+      let workSec=0, dayHrs=1, startVal;
 
       if (modeEl.value==='salary') {
         // Salary mode
-        const sal = parseFloat(document.getElementById('salaryAnnual').value);
-        const weekH = parseFloat(document.getElementById('hoursWeekly').value);
-        currencySymbol = currencySymbolElS.value;
-        if (isNaN(sal)||sal<=0) return alert('Enter valid annual salary');
-        if (isNaN(weekH)||weekH<=0) return alert('Enter valid hours/week');
-        ratePerSec = sal/(52*weekH*3600);
-
-        startInput = document.getElementById('startTime').value;
-        const [sh,sm] = startInput.split(':').map(Number);
-        const sd = new Date(now.getFullYear(),now.getMonth(),now.getDate(),sh,sm);
-        workSec = Math.max(0, Math.min((now-sd)/1000, (document.getElementById('endTime').value ?
-          ((new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTime').value.split(':').map(Number)) - sd)/1000) : Infinity));
-        dayHours = (new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTime').value.split(':').map(Number)) - sd)/3600000;
+        const sal = parseFloat(document.getElementById('salaryAnnual').value),
+              hrsW = parseFloat(document.getElementById('hoursWeekly').value);
+        currencySymbol = document.getElementById('currencyS').value;
+        if (!sal||!hrsW) return alert('Invalid salary or hours/week');
+        ratePerSec = sal/(52*hrsW*3600);
+        startVal = document.getElementById('startTime').value;
+        const endVal   = document.getElementById('endTime').value;
+        dayHrs = ((Date.parse(`1970-01-01T${endVal}`) -
+                   Date.parse(`1970-01-01T${startVal}`)) / 3600000) || 1;
       } else {
         // Hourly mode
-        const hr = parseFloat(document.getElementById('hourlyRate').value);
-        currencySymbol = currencySymbolElH.value;
-        if (isNaN(hr)||hr<=0) return alert('Enter valid hourly rate');
-        ratePerSec = hr/3600;
-
-        startInput = document.getElementById('startTimeH').value;
-        const [sh,sm] = startInput.split(':').map(Number);
-        const sd = new Date(now.getFullYear(),now.getMonth(),now.getDate(),sh,sm);
-        workSec = Math.max(0, Math.min((now-sd)/1000, (document.getElementById('endTimeH').value ?
-          ((new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTimeH').value.split(':').map(Number)) - sd)/1000) : Infinity));
-        dayHours = (new Date(now.getFullYear(),now.getMonth(),now.getDate(),...document.getElementById('endTimeH').value.split(':').map(Number)) - sd)/3600000;
+        const hrRate = parseFloat(document.getElementById('hourlyRate').value);
+        currencySymbol = document.getElementById('currencyH').value;
+        if (!hrRate) return alert('Invalid hourly rate');
+        ratePerSec = hrRate/3600;
+        startVal = document.getElementById('startTimeH').value;
+        const endVal = document.getElementById('endTimeH').value;
+        dayHrs = ((Date.parse(`1970-01-01T${endVal}`) -
+                   Date.parse(`1970-01-01T${startVal}`)) / 3600000) || 1;
       }
 
-      baseOffsetSec = workSec;
-      baseOffsetEarn = workSec * ratePerSec;
+      // Calculate already-earned seconds
+      const [sh,sm] = startVal.split(':').map(Number);
+      const sd = new Date(now.getFullYear(),now.getMonth(),now.getDate(),sh,sm);
+      workSec = Math.max(0,(now-sd)/1000);
+
+      baseSec  = workSec;
+      baseEarn = workSec*ratePerSec;
 
       // Populate stats
-      document.getElementById('perSecond').innerText = currencySymbol + ratePerSec.toFixed(2);
-      document.getElementById('perMinute').innerText = currencySymbol + (ratePerSec*60).toFixed(2);
-      document.getElementById('perHour').innerText   = currencySymbol + (ratePerSec*3600).toFixed(2);
-      document.getElementById('perDay').innerText    = currencySymbol + (ratePerSec*3600*dayHours).toFixed(2);
+      document.getElementById('perSecond').innerText = currencySymbol+ratePerSec.toFixed(2);
+      document.getElementById('perMinute').innerText = currencySymbol+(ratePerSec*60).toFixed(2);
+      document.getElementById('perHour').innerText   = currencySymbol+(ratePerSec*3600).toFixed(2);
+      document.getElementById('perDay').innerText    = currencySymbol+(ratePerSec*3600*dayHrs).toFixed(2);
 
-      // Show stopwatch
+      // Switch screens
       document.getElementById('config').classList.add('hidden');
       document.getElementById('stopwatch').classList.remove('hidden');
 
-      // Kick off RAF
-      startTS = performance.now();
-      pausedAccum = 0;
-      paused = false;
-      document.getElementById('pauseBtn').innerText = '⏸️ Pause';
-      updateFrame();
+      // RAF start
+      startTS=performance.now();
+      pausedAccum=0; paused=false;
+      document.getElementById('pauseBtn').innerText='⏸️ Pause';
+      tick();
     }
 
-    function updateFrame() {
+    function tick() {
       frame = requestAnimationFrame(ts => {
         if (!paused) {
-          const runSec = (ts - startTS - pausedAccum)/1000;
-          const totalSec = baseOffsetSec + runSec;
-          const totalEarn = baseOffsetEarn + runSec*ratePerSec;
+          const runSec = (ts-startTS-pausedAccum)/1000;
+          const totSec = baseSec+runSec;
+          const totEarn= baseEarn+(runSec*ratePerSec);
 
-          // Time display
-          const hh = String(Math.floor(totalSec/3600)).padStart(2,'0');
-          const mm = String(Math.floor((totalSec%3600)/60)).padStart(2,'0');
-          const ss = String(Math.floor(totalSec%60)).padStart(2,'0');
-          document.getElementById('timeDisplay').innerText = `${hh}:${mm}:${ss}`;
+          // Time
+          const hh=String(Math.floor(totSec/3600)).padStart(2,'0'),
+                mm=String(Math.floor((totSec%3600)/60)).padStart(2,'0'),
+                ss=String(Math.floor(totSec%60)).padStart(2,'0');
+          document.getElementById('timeDisplay').innerText=`${hh}:${mm}:${ss}`;
 
           // Earnings
-          document.getElementById('earnings').innerText = currencySymbol + totalEarn.toFixed(2);
+          document.getElementById('earnings').innerText=currencySymbol+totEarn.toFixed(2);
         }
-        updateFrame();
+        tick();
       });
     }
 
     function pauseResume() {
       if (!paused) {
-        paused = true; pauseStart = performance.now();
-        document.getElementById('pauseBtn').innerText = '▶️ Resume';
+        paused=true; pauseStart=performance.now();
+        document.getElementById('pauseBtn').innerText='▶️ Resume';
       } else {
-        paused = false; pausedAccum += performance.now() - pauseStart;
-        document.getElementById('pauseBtn').innerText = '⏸️ Pause';
+        paused=false; pausedAccum += performance.now()-pauseStart;
+        document.getElementById('pauseBtn').innerText='⏸️ Pause';
       }
     }
 
